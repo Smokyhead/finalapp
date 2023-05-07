@@ -7,6 +7,7 @@ import 'package:finalapp/screens/doctor_home/home_screens/notif_page.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/account_page.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
+import 'package:badges/badges.dart' as badges;
 
 class DoctorHome extends StatefulWidget {
   const DoctorHome({super.key});
@@ -18,11 +19,16 @@ class DoctorHome extends StatefulWidget {
 class _DoctorHomeState extends State<DoctorHome> {
   int currentPage = 0;
   final screens = const [HomePage(), NotifPage(), AccountPage()];
-
-  final items = const [
-    Icon(IconlyLight.home),
-    Icon(IconlyLight.notification),
-    Icon(IconlyLight.profile),
+  final items = [
+    const Icon(IconlyLight.home),
+    badges.Badge(
+        position: badges.BadgePosition.topEnd(),
+        badgeContent: const Text(
+          "!",
+          style: TextStyle(color: Colors.white),
+        ),
+        child: const Icon(IconlyLight.notification)),
+    const Icon(IconlyLight.profile),
   ];
   @override
   Widget build(BuildContext context) {

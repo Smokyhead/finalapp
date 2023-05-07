@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/doctor_home/home_screens/notif_page.dart';
 import 'package:finalapp/screens/patient_home/widgets/consultation_card.dart';
 import 'package:finalapp/screens/patient_home/widgets/title_bar.dart';
+import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -122,7 +124,9 @@ class Body extends StatelessWidget {
                   stream: FirebaseFirestore.instance
                       .collection("Appointments")
                       .where('isApproved', isEqualTo: true)
+                      .where('status', isEqualTo: 'upcoming')
                       .where('doctorId', isEqualTo: Doctor.uid)
+                      .orderBy('dateTime', descending: false)
                       .snapshots(),
                   builder: (context, snapshots) {
                     if (snapshots.connectionState == ConnectionState.waiting) {
@@ -156,12 +160,23 @@ class Body extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final data =
                                 docs[index].data() as Map<String, dynamic>;
+                            final appointmentTime =
+                                data['dateTime'] as Timestamp;
+                            final appointmentDateTime =
+                                appointmentTime.toDate();
+                            final currentTime = DateTime.now();
+                            if (appointmentDateTime.isBefore(currentTime)) {
+                              FirebaseFirestore.instance
+                                  .collection("Appointments")
+                                  .doc(data["id"])
+                                  .update({"status": "passed"});
+                            }
                             return ConsultationCard(
-                              doctorImageUrl: data['patientImageUrl'],
-                              doctorFirstName: data['patientFirstName'],
+                              imageUrl: data['patientImageUrl'],
+                              firstName: data['patientFirstName'],
                               date: data['date'],
                               time: data['time'],
-                              doctorLastName: data['patientLastName'],
+                              lastName: data['patientLastName'],
                             );
                           },
                         ),
@@ -195,9 +210,8 @@ class Body extends StatelessWidget {
                 ),
                 StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
-                      .collection("Appointments")
-                      .where('isApproved', isEqualTo: true)
-                      .where('doctorId', isEqualTo: Doctor.uid)
+                      .collection("Patients")
+                      .where('doctors', arrayContains: Doctor.uid)
                       .snapshots(),
                   builder: (context, snapshots) {
                     if (snapshots.connectionState == ConnectionState.waiting) {
@@ -207,53 +221,61 @@ class Body extends StatelessWidget {
                         ),
                       );
                     }
-                    final distinctPatients = <String>{};
-                    final docs = snapshots.data!.docs.where((doc) {
-                      final patientId = doc['patientId'] as String?;
-                      if (patientId == null) return false;
-                      return distinctPatients.add(patientId);
-                    }).toList();
-                    return SizedBox(
-                      height: 145,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(width: 20),
-                        itemCount: docs.length,
-                        itemBuilder: (context, index) {
-                          var data = docs[index].data() as Map<String, dynamic>;
-                          return Column(
-                            children: [
-                              Container(
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey,
-                                      spreadRadius: 0.005,
-                                      blurRadius: 10,
-                                    )
-                                  ],
+                    final docs = snapshots.data!.docs;
+                    if (docs.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          "Vous n'avez aucun patient pour le moment",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.grey),
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    } else {
+                      return SizedBox(
+                        height: 145,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(width: 20),
+                          itemCount: docs.length,
+                          itemBuilder: (context, index) {
+                            var data =
+                                docs[index].data() as Map<String, dynamic>;
+                            return Column(
+                              children: [
+                                Container(
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey,
+                                        spreadRadius: 0.005,
+                                        blurRadius: 10,
+                                      )
+                                    ],
+                                  ),
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.grey,
+                                    radius: 50,
+                                    backgroundImage: const AssetImage(
+                                        "assets/images/avatar.jpg"),
+                                    foregroundImage: data['imageUrl'].isEmpty
+                                        ? null
+                                        : NetworkImage(data['imageUrl']),
+                                  ),
                                 ),
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.grey,
-                                  radius: 50,
-                                  backgroundImage: const AssetImage(
-                                      "assets/images/avatar.jpg"),
-                                  foregroundImage: data['patientImageUrl']
-                                          .isEmpty
-                                      ? null
-                                      : NetworkImage(data['patientImageUrl']),
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(data['patientFirstName']),
-                              Text(data['patientLastName']),
-                            ],
-                          );
-                        },
-                      ),
-                    );
+                                const SizedBox(height: 5),
+                                Text(data['firstName']),
+                                Text(data['lastName']),
+                              ],
+                            );
+                          },
+                        ),
+                      );
+                    }
                   },
                 ),
               ],

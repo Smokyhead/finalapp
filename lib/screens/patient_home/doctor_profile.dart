@@ -1,9 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
-import 'package:finalapp/models/appoint_model.dart';
 import 'package:finalapp/models/users.dart';
 import 'package:finalapp/screens/patient_home/widgets/appointment.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
+import 'package:uuid/uuid.dart';
 
 class DoctorProfile extends StatefulWidget {
   const DoctorProfile({super.key});
@@ -13,6 +14,55 @@ class DoctorProfile extends StatefulWidget {
 }
 
 class _DoctorProfileState extends State<DoctorProfile> {
+  final myController = TextEditingController();
+  String uuid = "";
+
+  Future submitFeedback() async {
+    if (myController.text.isEmpty) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text(
+                "OOPS!",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+              ),
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              content: const Text("Veuillez séléctionner le temps et la date."),
+              actions: [
+                ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(kPrimaryColor),
+                      foregroundColor: MaterialStateProperty.all(Colors.white),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("OK"))
+              ],
+            );
+          });
+    } else {
+      uuid = const Uuid().v4();
+      FirebaseFirestore.instance.collection("Feedbacks").doc(uuid).set({
+        "id": uuid,
+        "patientId": Patient.uid,
+        "patientName": "${Patient.firstName} ${Patient.lastName}",
+        "doctorId": Doctor.uid,
+        "doctorName": "${Doctor.firstName} ${Doctor.lastName}",
+        "feedback": myController.text
+      });
+      FirebaseFirestore.instance.collection('Doctors').doc(Doctor.uid).update({
+        'feedbacks': FieldValue.arrayUnion([uuid])
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -119,14 +169,15 @@ class _DoctorProfileState extends State<DoctorProfile> {
               color: Colors.black,
             ),
             Padding(
-              padding: const EdgeInsets.all(30),
+              padding: const EdgeInsets.all(20),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
                     const Text(
                       "Services:",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                     ),
                     const SizedBox(
                       width: 20,
@@ -208,9 +259,101 @@ class _DoctorProfileState extends State<DoctorProfile> {
                     style: TextStyle(fontSize: 23.5),
                   )),
             ),
+            TextButton(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text(
+                            "Comment vous trouvez ce docteur?",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 17),
+                          ),
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20))),
+                          content: TextFieldContainer(
+                            child: TextField(
+                              textCapitalization: TextCapitalization.sentences,
+                              controller: myController,
+                              keyboardType: TextInputType.multiline,
+                              maxLines: 6,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Tapez votre réponse ici",
+                              ),
+                            ),
+                          ),
+                          actions: [
+                            ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all(kPrimaryColor),
+                                  foregroundColor:
+                                      MaterialStateProperty.all(Colors.white),
+                                  shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30)),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Annuler")),
+                            ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all(kPrimaryColor),
+                                  foregroundColor:
+                                      MaterialStateProperty.all(Colors.white),
+                                  shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30)),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  submitFeedback();
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Valider"))
+                          ],
+                        );
+                      });
+                },
+                child: const Text(
+                  "Ajoutez un feedback",
+                  style: TextStyle(
+                      color: kPrimaryColor, fontWeight: FontWeight.bold),
+                ))
           ],
         ),
       ),
+    );
+  }
+}
+
+class TextFieldContainer extends StatelessWidget {
+  final Widget child;
+  const TextFieldContainer({
+    super.key,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      width: size.width * 0.8,
+      height: 150,
+      decoration: BoxDecoration(
+          color: kPrimaryLightColor, borderRadius: BorderRadius.circular(5)),
+      child: child,
     );
   }
 }

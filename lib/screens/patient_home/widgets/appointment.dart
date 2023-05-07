@@ -25,63 +25,12 @@ class _AppointmentPageState extends State<AppointmentPage> {
   DateTime _selectedTime = DateTime.now();
   String formattedTime = "";
   String formattedDate = "";
+  late DateTime dateTime;
   String uuid = "";
   bool isApproved = false;
 
   Future saveDataToFirestore() async {
-    uuid = const Uuid().v4();
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('Appointments')
-        .where('doctorId', isEqualTo: Doctor.uid)
-        .where('date', isEqualTo: formattedDate)
-        .where('time', isEqualTo: formattedTime)
-        .where('isApproved', isEqualTo: true)
-        .get();
-    if (querySnapshot.docs.isEmpty) {
-      FirebaseFirestore.instance.collection("Appointments").doc(uuid).set({
-        "id": uuid,
-        "doctorId": Doctor.uid,
-        "doctorFirstName": Doctor.firstName,
-        "doctorLastName": Doctor.lastName,
-        "patientId": Patient.uid,
-        "patientFirstName": Patient.firstName,
-        "patientLastName": Patient.lastName,
-        "date": formattedDate,
-        "time": formattedTime,
-        "isApproved": isApproved,
-        "doctorImageUrl": Doctor.imageUrl,
-        "patientImageUrl": Patient.imageUrl,
-      });
-      showDialog(
-          context: (context),
-          builder: (BuildContext context) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: kPrimaryColor,
-              ),
-            );
-          });
-      Timer(const Duration(milliseconds: 500), () {
-        Navigator.pop(context);
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const AlertDialog(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20))),
-                content: Text(
-                  "Votre demande pour rendez-vous a était envoyée avec succés",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: kPrimaryColor),
-                ),
-              );
-            });
-        Timer(const Duration(seconds: 2), () {
-          Navigator.pop(context);
-          Navigator.pop(context);
-        });
-      });
-    } else {
+    if (formattedDate.isEmpty || formattedTime.isEmpty) {
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -92,8 +41,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
               ),
               shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(20))),
-              content: const Text(
-                  "Le temps que vous avez choisi est déjà reservé,\nveuillez en choisir un autre."),
+              content: const Text("Veuillez séléctionner le temps et la date."),
               actions: [
                 ElevatedButton(
                     style: ButtonStyle(
@@ -111,8 +59,99 @@ class _AppointmentPageState extends State<AppointmentPage> {
               ],
             );
           });
+    } else {
+      String date = DateFormat('yyyy-MM-dd').format(_selectedDate);
+      dateTime = DateTime.parse("$date $formattedTime:00");
+      print(dateTime);
+      uuid = const Uuid().v4();
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Appointments')
+          .where('doctorId', isEqualTo: Doctor.uid)
+          .where('date', isEqualTo: formattedDate)
+          .where('time', isEqualTo: formattedTime)
+          .where('isApproved', isEqualTo: true)
+          .get();
+      if (querySnapshot.docs.isEmpty) {
+        FirebaseFirestore.instance.collection("Appointments").doc(uuid).set({
+          "id": uuid,
+          "doctorId": Doctor.uid,
+          "doctorFirstName": Doctor.firstName,
+          "doctorLastName": Doctor.lastName,
+          "patientId": Patient.uid,
+          "patientFirstName": Patient.firstName,
+          "patientLastName": Patient.lastName,
+          "date": formattedDate,
+          "time": formattedTime,
+          "isApproved": isApproved,
+          "doctorImageUrl": Doctor.imageUrl,
+          "patientImageUrl": Patient.imageUrl,
+          "dateTime": dateTime,
+          "status": "upcoming"
+        });
+        showDialog(
+            context: (context),
+            builder: (BuildContext context) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: kPrimaryColor,
+                ),
+              );
+            });
+        Timer(const Duration(milliseconds: 500), () {
+          Navigator.pop(context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return const AlertDialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20))),
+                  content: Text(
+                    "Votre demande pour rendez-vous a était envoyée avec succés",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: kPrimaryColor),
+                  ),
+                );
+              });
+          Timer(const Duration(seconds: 2), () {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          });
+        });
+      } else {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text(
+                  "OOPS!",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                ),
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                content: const Text(
+                    "Le temps que vous avez choisi est déjà reservé,\nveuillez en choisir un autre."),
+                actions: [
+                  ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(kPrimaryColor),
+                        foregroundColor:
+                            MaterialStateProperty.all(Colors.white),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("OK"))
+                ],
+              );
+            });
+      }
+      uuid = "";
     }
-    uuid = "";
   }
 
   @override
@@ -361,10 +400,11 @@ class _AppointmentPageState extends State<AppointmentPage> {
             SizedBox(
               height: 250,
               child: CupertinoDatePicker(
+                minuteInterval: 15,
                 use24hFormat: true,
-                initialDateTime: _selectedTime,
                 mode: CupertinoDatePickerMode.time,
-                //use24hFormat: true,
+                initialDateTime: DateTime.now()
+                    .add(Duration(minutes: 15 - DateTime.now().minute % 15)),
                 onDateTimeChanged: (value) => setState(() {
                   _selectedTime = value;
                   formattedTime = DateFormat('HH:mm').format(_selectedTime);
@@ -425,7 +465,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                     _selectedDate = value;
 
                     formattedDate =
-                        DateFormat('dd/MM/yyyy').format(_selectedDate);
+                        DateFormat('dd-MM-yyyy').format(_selectedDate);
                     dateContr.text = formattedDate;
                   });
                 },

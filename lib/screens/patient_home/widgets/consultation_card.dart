@@ -1,19 +1,20 @@
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/doctor_home/home_screens/notif_page.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 
 class ConsultationCard extends StatelessWidget {
   const ConsultationCard(
       {super.key,
-      required this.doctorImageUrl,
-      required this.doctorFirstName,
+      required this.imageUrl,
+      required this.firstName,
       required this.date,
       required this.time,
-      required this.doctorLastName});
-  final String doctorImageUrl;
-  final String doctorFirstName;
-  final String doctorLastName;
+      required this.lastName});
+  final String imageUrl;
+  final String firstName;
+  final String lastName;
   final String date;
   final String time;
 
@@ -58,9 +59,8 @@ class ConsultationCard extends StatelessWidget {
                     radius: 25,
                     backgroundImage:
                         const AssetImage("assets/images/avatar.jpg"),
-                    foregroundImage: Doctor.imageUrl.isEmpty
-                        ? null
-                        : NetworkImage(doctorImageUrl),
+                    foregroundImage:
+                        Doctor.imageUrl.isEmpty ? null : NetworkImage(imageUrl),
                   ),
                 ),
                 Column(
@@ -83,7 +83,7 @@ class ConsultationCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "$doctorFirstName $doctorLastName",
+                  "$firstName $lastName",
                   style: const TextStyle(
                       fontWeight: FontWeight.bold, fontSize: 16),
                 ),
@@ -93,8 +93,21 @@ class ConsultationCard extends StatelessWidget {
               height: 5,
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                CircleAvatar(
+                  radius: 17,
+                  backgroundColor: Colors.red,
+                  child: IconButton(
+                    onPressed: () {
+                    },
+                    icon: const Icon(
+                      IconlyBold.delete,
+                      size: 18,
+                    ),
+                    color: Colors.white,
+                  ),
+                ),
                 CircleAvatar(
                   radius: 17,
                   backgroundColor: Colors.green,
@@ -106,37 +119,7 @@ class ConsultationCard extends StatelessWidget {
                     ),
                     color: Colors.white,
                   ),
-                ),
-                const SizedBox(
-                  width: 7.5,
-                ),
-                CircleAvatar(
-                  radius: 17,
-                  backgroundColor: Colors.red,
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      IconlyBold.delete,
-                      size: 18,
-                    ),
-                    color: Colors.white,
-                  ),
-                ),
-                const Spacer(
-                  flex: 1,
-                ),
-                CircleAvatar(
-                  radius: 17,
-                  backgroundColor: kPrimaryColor,
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.edit,
-                      size: 18,
-                    ),
-                    color: Colors.white,
-                  ),
-                ),
+                )
               ],
             )
           ],

@@ -325,7 +325,8 @@ class _BodyState extends State<Body> {
       "lastName": lastNameController.text.trim(),
       "phone": phoneController.text,
       "birthDate": dateController.text.trim(),
-      "imageUrl": ""
+      "imageUrl": "",
+      "doctors": []
     });
 
     //save data locally
@@ -342,6 +343,7 @@ class _BodyState extends State<Body> {
     await sharedPreferences.setString(
         "birthDate", dateController.text.toString());
     await sharedPreferences.setString("imageUrl", "");
+    await sharedPreferences.setStringList("doctors", []);
   }
 
   @override

@@ -1,20 +1,15 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
 import 'package:finalapp/screens/auth/Doctor_Login/doctor_login_screen.dart';
 import 'package:finalapp/screens/auth/Patient_Signup/Components/background_signup.dart';
 import 'package:finalapp/screens/auth/Pic_Selection_doctor/dpic_selection_screen.dart';
-import 'package:finalapp/screens/doctor_home/doctor_home.dart';
 import 'package:finalapp/services/firestoreServices.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Body extends StatefulWidget {
@@ -117,30 +112,65 @@ class _BodyState extends State<Body> {
   }
 
   Future<void> formValidation() async {
-    if (_isValidEmail(emailController.text) == true &&
-        _isPhoneValid(phoneController.text) == true) {
-      if (pwController.text.trim() == pwConfController.text.trim()) {
-        if (firstNameController.text.isNotEmpty &&
-            lastNameController.text.isNotEmpty &&
-            _isValidEmail(emailController.text) == true &&
-            _isPhoneValid(phoneController.text) == true &&
-            pwController.text.isNotEmpty &&
-            pwConfController.text.isNotEmpty) {
-          if (_isValidPassword(pwController.text.trim()) == true) {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return const AlertDialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20))),
-                    content: Text(
-                      "Compte encours de création...",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: kPrimaryColor),
-                    ),
-                  );
-                });
-            authenticateAndSignUp();
+    if (selectedItems.isNotEmpty) {
+      if (_isValidEmail(emailController.text) == true &&
+          _isPhoneValid(phoneController.text) == true) {
+        if (pwController.text.trim() == pwConfController.text.trim()) {
+          if (firstNameController.text.isNotEmpty &&
+              lastNameController.text.isNotEmpty &&
+              _isValidEmail(emailController.text) == true &&
+              _isPhoneValid(phoneController.text) == true &&
+              pwController.text.isNotEmpty &&
+              pwConfController.text.isNotEmpty) {
+            if (_isValidPassword(pwController.text.trim()) == true) {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return const AlertDialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      content: Text(
+                        "Compte encours de création...",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: kPrimaryColor),
+                      ),
+                    );
+                  });
+              authenticateAndSignUp();
+            } else {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text(
+                        "OOPS!",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 30),
+                      ),
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      content: const Text(
+                          "Le mot de passe doit contenir au minimum:\n8 caractères\nUne lettre majuscule\nUne lettre minuscule\nUn chiffre\nUn symbole"),
+                      actions: [
+                        ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(kPrimaryColor),
+                              foregroundColor:
+                                  MaterialStateProperty.all(Colors.white),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30)),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text("OK"))
+                      ],
+                    );
+                  });
+            }
           } else {
             showDialog(
                 context: context,
@@ -153,8 +183,7 @@ class _BodyState extends State<Body> {
                     ),
                     shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20))),
-                    content: const Text(
-                        "Le mot de passe doit contenir au minimum:\n8 caractères\nUne lettre majuscule\nUne lettre minuscule\nUn chiffre\nUn symbole"),
+                    content: const Text("Veillez saisir vos données"),
                     actions: [
                       ElevatedButton(
                           style: ButtonStyle(
@@ -186,7 +215,7 @@ class _BodyState extends State<Body> {
                   ),
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(20))),
-                  content: const Text("Veillez saisir vos données"),
+                  content: const Text("Veillez confirmer votre mot de passe"),
                   actions: [
                     ElevatedButton(
                         style: ButtonStyle(
@@ -218,7 +247,7 @@ class _BodyState extends State<Body> {
                 ),
                 shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20))),
-                content: const Text("Veillez confirmer votre mot de passe"),
+                content: const Text("Email ou téléphone invalide"),
                 actions: [
                   ElevatedButton(
                       style: ButtonStyle(
@@ -250,7 +279,7 @@ class _BodyState extends State<Body> {
               ),
               shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(20))),
-              content: const Text("Email ou téléphone invalide"),
+              content: const Text("Veuillez séléctionnez au moins un service."),
               actions: [
                 ElevatedButton(
                     style: ButtonStyle(
@@ -366,7 +395,8 @@ class _BodyState extends State<Body> {
       "lastName": lastNameController.text.trim(),
       "phone": phoneController.text,
       "services": selectedItems,
-      "imageUrl": ""
+      "imageUrl": "",
+      "patients": []
     });
 
     //save data locally
@@ -382,6 +412,7 @@ class _BodyState extends State<Body> {
     await sharedPreferences.setString("phone", phoneController.text.toString());
     await sharedPreferences.setStringList("services", selectedItems);
     await sharedPreferences.setString("imageUrl", "");
+    await sharedPreferences.setStringList("patients", []);
   }
 
   @override
