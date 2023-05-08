@@ -3,15 +3,20 @@ import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
+import 'package:uuid/uuid.dart';
 
-class NotifPage extends StatefulWidget {
-  const NotifPage({super.key});
+class DNotifPage extends StatefulWidget {
+  const DNotifPage({super.key});
+
+  static int notifNumber = 0;
 
   @override
-  State<StatefulWidget> createState() => _NotifPageState();
+  State<StatefulWidget> createState() => _DNotifPageState();
 }
 
-class _NotifPageState extends State<NotifPage> {
+class _DNotifPageState extends State<DNotifPage> {
+  final DateTime dateTime = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,6 +44,7 @@ class _NotifPageState extends State<NotifPage> {
             );
           }
           final docs = snapshots.data?.docs;
+          DNotifPage.notifNumber = snapshots.data!.docs.length;
           if (docs == null || docs.isEmpty) {
             return const Center(
               child: Text(
@@ -115,6 +121,20 @@ class _NotifPageState extends State<NotifPage> {
                                         .update({
                                       'doctors':
                                           FieldValue.arrayUnion([Doctor.uid])
+                                    });
+                                    final uuid = const Uuid().v4();
+                                    FirebaseFirestore.instance
+                                        .collection('Notifications')
+                                        .doc(uuid)
+                                        .set({
+                                      'read': false,
+                                      'patient': data['patientId'],
+                                      'doctor': data['doctorId'],
+                                      'doctorImage': data['doctorImageUrl'],
+                                      'title': "Confirmation",
+                                      'content':
+                                          "Votre demande pour rendez-vous avec Dr ${data['doctorFirstName']} ${data['doctorLastName']} le ${data['date']} à ${data['time']} est confirmée",
+                                      'dateTime': dateTime
                                     });
                                   },
                                   icon: const Icon(

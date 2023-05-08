@@ -1,8 +1,10 @@
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/notif_page.dart';
+import 'package:finalapp/screens/patient_home/home_screens/notif_page.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ConsultationCard extends StatelessWidget {
   const ConsultationCard(
@@ -99,8 +101,7 @@ class ConsultationCard extends StatelessWidget {
                   radius: 17,
                   backgroundColor: Colors.red,
                   child: IconButton(
-                    onPressed: () {
-                    },
+                    onPressed: () {},
                     icon: const Icon(
                       IconlyBold.delete,
                       size: 18,

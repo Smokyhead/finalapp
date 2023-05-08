@@ -2,16 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
 import 'package:flutter/material.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
-class NotifPage extends StatefulWidget {
-  const NotifPage({super.key});
+class PNotifPage extends StatefulWidget {
+  const PNotifPage({super.key});
+
+  static int notifNumber = 0;
 
   @override
-  State<StatefulWidget> createState() => _NotifPageState();
+  State<StatefulWidget> createState() => _PNotifPageState();
 }
 
-class _NotifPageState extends State<NotifPage> {
-  static int number = 0;
+class _PNotifPageState extends State<PNotifPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,9 +28,8 @@ class _NotifPageState extends State<NotifPage> {
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection("Appointments")
-            .where('isApproved', isEqualTo: true)
-            .where('patientId', isEqualTo: Patient.uid)
+            .collection("Notifications")
+            .where('patient', isEqualTo: Patient.uid)
             .snapshots(),
         builder: (context, snapshots) {
           if (snapshots.connectionState == ConnectionState.waiting) {
@@ -39,7 +40,7 @@ class _NotifPageState extends State<NotifPage> {
             );
           }
           final docs = snapshots.data?.docs;
-          number = snapshots.data!.docs.length;
+          PNotifPage.notifNumber = snapshots.data!.docs.length;
           if (docs == null || docs.isEmpty) {
             return const Center(
               child: Text(
@@ -56,11 +57,14 @@ class _NotifPageState extends State<NotifPage> {
                 height: 170,
                 child: ListView.separated(
                     separatorBuilder: (context, index) => const Divider(),
-                    itemCount: number,
+                    itemCount: snapshots.data!.docs.length,
                     itemBuilder: (context, index) {
                       var data = snapshots.data!.docs[index].data()
                           as Map<String, dynamic>;
                       return ListTile(
+                        tileColor:
+                            data['read'] == false ? kPrimaryLightColor : null,
+                        contentPadding: const EdgeInsets.all(10),
                         isThreeLine: true,
                         leading: CircleAvatar(
                           radius: 30,
@@ -68,24 +72,34 @@ class _NotifPageState extends State<NotifPage> {
                               const Color.fromARGB(255, 203, 203, 203),
                           backgroundImage:
                               const AssetImage("assets/images/avatar.jpg"),
-                          foregroundImage: data['doctorImageUrl'].isEmpty
+                          foregroundImage: data['doctorImage'].isEmpty
                               ? null
-                              : NetworkImage(data['doctorImageUrl']),
+                              : NetworkImage(data['doctorImage']),
                         ),
-                        title: const Text(
-                          "Notification de confirmation",
+                        title: Text(
+                          data['title'],
                           maxLines: 1,
-                          style: TextStyle(
+                          style: const TextStyle(
                               color: Colors.black,
                               fontSize: 15,
                               fontWeight: FontWeight.bold),
                         ),
-                        subtitle: Text(
-                          "Votre demande pour rendez-vous avec Dr ${data['doctorFirstName']} ${data['doctorLastName']} le ${data['date']} à ${data['time']} est confirmée",
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 13,
-                          ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              data['content'],
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 13,
+                              ),
+                            ),
+                            Text(
+                              timeago.format(data['dateTime'].toDate(),
+                                  locale: 'en_short'),
+                              textAlign: TextAlign.left,
+                            )
+                          ],
                         ),
                       );
                     }));
