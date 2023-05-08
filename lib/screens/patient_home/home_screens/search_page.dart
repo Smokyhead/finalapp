@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -83,7 +85,6 @@ class _SearchPageState extends State<SearchPage> {
                       return ListTile(
                         onTap: () {
                           final id = data['userUID'];
-                          // ignore: avoid_print
                           print(id);
                           FirestoreServices.getDoctorById(id);
                           showDialog(

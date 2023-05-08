@@ -5,7 +5,6 @@ import 'package:finalapp/screens/Welcome/welcome_screen.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/app_feedback.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/change_pw.dart';
 import 'package:finalapp/services/firestoreServices.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,8 +17,6 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   bool hidePassword = true;
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +41,7 @@ class _AccountPageState extends State<AccountPage> {
             const SizedBox(
               height: 50,
             ),
-            Container(
+            SizedBox(
               width: 200,
               height: 45,
               child: TextButton(
@@ -103,7 +100,7 @@ class _AccountPageState extends State<AccountPage> {
                 onPressed: () {
                   FirestoreServices.signOut();
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return WelcomeScreen();
+                    return const WelcomeScreen();
                   }));
                 },
                 style: ButtonStyle(

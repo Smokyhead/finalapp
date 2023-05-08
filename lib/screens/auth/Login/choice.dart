@@ -1,8 +1,6 @@
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/screens/auth/Doctor_Login/doctor_login_screen.dart';
-import 'package:finalapp/screens/auth/Doctor_Signup/doctor_signup_screen.dart';
 import 'package:finalapp/screens/auth/Login/login-screen.dart';
-import 'package:finalapp/screens/auth/Patient_Signup/patient_signup_screen.dart';
 import 'package:flutter/material.dart';
 
 class LoginChoicePage extends StatefulWidget {
@@ -79,7 +77,7 @@ class _LoginChoicePage extends State<LoginChoicePage> {
                 ),
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return LoginScreen();
+                    return const LoginScreen();
                   }));
                 },
                 child: const Text(
@@ -95,7 +93,7 @@ class _LoginChoicePage extends State<LoginChoicePage> {
               TextButton(
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return LoginScreen();
+                    return const LoginScreen();
                   }));
                 },
                 child: const Text(

@@ -54,7 +54,7 @@ class _PatientHomeState extends State<PatientHome> {
             selectedColor: kPrimaryColor,
           ),
           BottomBarItem(
-              icon: Icon(IconlyLight.notification),
+              icon: const Icon(IconlyLight.notification),
               title: const Text("Notifications"),
               unSelectedColor: Colors.black,
               selectedColor: kPrimaryColor),

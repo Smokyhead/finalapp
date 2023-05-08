@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
-import 'package:finalapp/screens/doctor_home/home_screens/notif_page.dart';
 import 'package:finalapp/screens/patient_home/widgets/consultation_card.dart';
 import 'package:finalapp/screens/patient_home/widgets/title_bar.dart';
-import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
