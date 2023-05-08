@@ -53,17 +53,19 @@ class _PNotifPageState extends State<PNotifPage> {
               ),
             );
           } else {
-            return SizedBox(
-                height: 170,
-                child: ListView.separated(
-                    separatorBuilder: (context, index) => const Divider(),
-                    itemCount: snapshots.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      var data = snapshots.data!.docs[index].data()
-                          as Map<String, dynamic>;
-                      return ListTile(
-                        tileColor:
-                            data['read'] == false ? kPrimaryLightColor : null,
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListView.separated(
+                  separatorBuilder: (context, index) => const Divider(),
+                  itemCount: snapshots.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    var data = snapshots.data!.docs[index].data()
+                        as Map<String, dynamic>;
+                    return Card(
+                      color: data['read'] == false ? kPrimaryLightColor : null,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                      child: ListTile(
                         contentPadding: const EdgeInsets.all(10),
                         isThreeLine: true,
                         leading: CircleAvatar(
@@ -101,8 +103,45 @@ class _PNotifPageState extends State<PNotifPage> {
                             )
                           ],
                         ),
-                      );
-                    }));
+                        trailing: IconButton(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                      shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15))),
+                                      content: SizedBox(
+                                        height: 128,
+                                        child: Column(children: const [
+                                          ListTile(
+                                            tileColor: kPrimaryLightColor,
+                                            title: Text("Marquer comme lu"),
+                                          ),
+                                          Divider(),
+                                          ListTile(
+                                            tileColor: kPrimaryLightColor,
+                                            title: Text(
+                                              "Supprimer",
+                                              style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          )
+                                        ]),
+                                      ));
+                                });
+                          },
+                          icon: const Icon(
+                            Icons.more_vert,
+                            size: 32.5,
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+            );
           }
         },
       ),

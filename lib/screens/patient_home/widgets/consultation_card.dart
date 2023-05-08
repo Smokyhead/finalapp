@@ -31,7 +31,7 @@ class ConsultationCard extends StatelessWidget {
             )
           ],
           color: kPrimaryLightColor,
-          border: Border.all(color: Colors.black),
+          border: Border.all(color: Colors.grey),
           borderRadius: const BorderRadius.all(Radius.circular(20))),
       child: Padding(
         padding:

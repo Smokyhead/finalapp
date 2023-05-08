@@ -122,10 +122,10 @@ class _DNotifPageState extends State<DNotifPage> {
                                       'doctors':
                                           FieldValue.arrayUnion([Doctor.uid])
                                     });
-                                    final uuid = const Uuid().v4();
+                                    final uuid1 = const Uuid().v4();
                                     FirebaseFirestore.instance
                                         .collection('Notifications')
-                                        .doc(uuid)
+                                        .doc(uuid1)
                                         .set({
                                       'read': false,
                                       'patient': data['patientId'],
@@ -134,7 +134,8 @@ class _DNotifPageState extends State<DNotifPage> {
                                       'title': "Confirmation",
                                       'content':
                                           "Votre demande pour rendez-vous avec Dr ${data['doctorFirstName']} ${data['doctorLastName']} le ${data['date']} à ${data['time']} est confirmée",
-                                      'dateTime': dateTime
+                                      'dateTime': dateTime,
+                                      'appointmentId': data['id']
                                     });
                                   },
                                   icon: const Icon(
@@ -153,6 +154,21 @@ class _DNotifPageState extends State<DNotifPage> {
                                         .collection("Appointments")
                                         .doc(data['id'])
                                         .delete();
+                                    final uuid2 = const Uuid().v4();
+                                    FirebaseFirestore.instance
+                                        .collection('Notifications')
+                                        .doc(uuid2)
+                                        .set({
+                                      'read': false,
+                                      'patient': data['patientId'],
+                                      'doctor': data['doctorId'],
+                                      'doctorImage': data['doctorImageUrl'],
+                                      'title': "Refus",
+                                      'content':
+                                          "Votre demande pour rendez-vous avec Dr ${data['doctorFirstName']} ${data['doctorLastName']} le ${data['date']} à ${data['time']} est refusée",
+                                      'dateTime': dateTime,
+                                      'appointmentId': data['id']
+                                    });
                                   },
                                   icon: const Icon(
                                     IconlyBold.delete,

@@ -64,14 +64,21 @@ class _AppointmentPageState extends State<AppointmentPage> {
       dateTime = DateTime.parse("$date $formattedTime:00");
       print(dateTime);
       uuid = const Uuid().v4();
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+      QuerySnapshot querySnapshot1 = await FirebaseFirestore.instance
           .collection('Appointments')
           .where('doctorId', isEqualTo: Doctor.uid)
           .where('date', isEqualTo: formattedDate)
           .where('time', isEqualTo: formattedTime)
           .where('isApproved', isEqualTo: true)
           .get();
-      if (querySnapshot.docs.isEmpty) {
+      QuerySnapshot querySnapshot2 = await FirebaseFirestore.instance
+          .collection('Appointments')
+          .where('patientId', isEqualTo: Patient.uid)
+          .where('date', isEqualTo: formattedDate)
+          .where('time', isEqualTo: formattedTime)
+          .where('isApproved', isEqualTo: true)
+          .get();
+      if (querySnapshot1.docs.isEmpty && querySnapshot2.docs.isEmpty) {
         FirebaseFirestore.instance.collection("Appointments").doc(uuid).set({
           "id": uuid,
           "doctorId": Doctor.uid,

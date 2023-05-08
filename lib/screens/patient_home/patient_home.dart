@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:stylish_bottom_bar/model/bar_items.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
+import 'package:badges/badges.dart' as badges;
 
 class PatientHome extends StatefulWidget {
   const PatientHome({super.key});
@@ -54,7 +55,13 @@ class _PatientHomeState extends State<PatientHome> {
             selectedColor: kPrimaryColor,
           ),
           BottomBarItem(
-              icon: const Icon(IconlyLight.notification),
+              icon: badges.Badge(
+                  showBadge: PNotifPage.notifNumber == 0 ? false : true,
+                  badgeContent: Text(
+                    "${PNotifPage.notifNumber}",
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  child: const Icon(IconlyLight.notification)),
               title: const Text("Notifications"),
               unSelectedColor: Colors.black,
               selectedColor: kPrimaryColor),
