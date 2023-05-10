@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
+import 'package:finalapp/models/users.dart';
 import 'package:finalapp/screens/patient_home/home_screens/account_page.dart';
 import 'package:finalapp/screens/patient_home/home_screens/home_page.dart';
 import 'package:finalapp/screens/patient_home/home_screens/notif_page.dart';
@@ -24,9 +26,18 @@ class _PatientHomeState extends State<PatientHome> {
     PNotifPage(),
     AccountPage(),
   ];
-
+  static int? nb;
   @override
   Widget build(BuildContext context) {
+    FirebaseFirestore.instance
+        .collection('Notifications')
+        .where('read', isEqualTo: false)
+        .where('patient', isEqualTo: Patient.uid)
+        .snapshots()
+        .listen((event) {
+      int unreadCount = event.docs.length;
+      nb = unreadCount;
+    });
     return Scaffold(
       body: IndexedStack(
         index: currentPage,
@@ -56,9 +67,9 @@ class _PatientHomeState extends State<PatientHome> {
           ),
           BottomBarItem(
               icon: badges.Badge(
-                  showBadge: PNotifPage.notifNumber == 0 ? false : true,
+                  showBadge: nb == 0 || nb == null ? false : true,
                   badgeContent: Text(
-                    "${PNotifPage.notifNumber}",
+                    nb.toString(),
                     style: const TextStyle(color: Colors.white),
                   ),
                   child: const Icon(IconlyLight.notification)),

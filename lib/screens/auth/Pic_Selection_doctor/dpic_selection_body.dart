@@ -109,8 +109,13 @@ class _DPicSelectBodyState extends State<DPicSelectBody> {
                     onPressed: () {
                       if (_imageFile != null) {
                         uploadImage();
+                        checkUrl();
+                      } else {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const DoctorHome()));
                       }
-                      checkUrl();
                     },
                     child: const Text(
                       "OK",
@@ -253,8 +258,8 @@ class _DPicSelectBodyState extends State<DPicSelectBody> {
       });
     } else {
       Timer(const Duration(seconds: 1), () {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const DoctorHome()));
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const DoctorHome()));
       });
     }
   }

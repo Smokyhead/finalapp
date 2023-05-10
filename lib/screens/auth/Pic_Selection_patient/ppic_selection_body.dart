@@ -109,8 +109,13 @@ class _PPicSelectBodyState extends State<PPicSelectBody> {
                     onPressed: () {
                       if (_imageFile != null) {
                         uploadImage();
+                        checkUrl();
+                      } else {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const PatientHome()));
                       }
-                      checkUrl();
                     },
                     child: const Text(
                       "OK",

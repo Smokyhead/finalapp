@@ -2,12 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class PNotifPage extends StatefulWidget {
   const PNotifPage({super.key});
-
-  static int notifNumber = 0;
 
   @override
   State<StatefulWidget> createState() => _PNotifPageState();
@@ -20,7 +19,11 @@ class _PNotifPageState extends State<PNotifPage> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
         child: AppBar(
-          automaticallyImplyLeading: false,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(15),
+          )),
+          leading: const Icon(IconlyBroken.notification),
           backgroundColor: kPrimaryColor,
           foregroundColor: Colors.white,
           title: const Text("Notifications"),
@@ -40,7 +43,6 @@ class _PNotifPageState extends State<PNotifPage> {
             );
           }
           final docs = snapshots.data?.docs;
-          PNotifPage.notifNumber = snapshots.data!.docs.length;
           if (docs == null || docs.isEmpty) {
             return const Center(
               child: Text(
@@ -62,10 +64,54 @@ class _PNotifPageState extends State<PNotifPage> {
                     var data = snapshots.data!.docs[index].data()
                         as Map<String, dynamic>;
                     return Card(
-                      color: data['read'] == false ? kPrimaryLightColor : null,
+                      elevation: 2.5,
+                      color: data['read'] == false
+                          ? kPrimaryLightColor
+                          : const Color.fromARGB(255, 243, 243, 243),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
                       child: ListTile(
+                        onLongPress: () {
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15))),
+                                    content: SizedBox(
+                                      height: 128,
+                                      child: Column(children: [
+                                        ListTile(
+                                          onTap: () {
+                                            FirebaseFirestore.instance
+                                                .collection("Notifications")
+                                                .doc(data['id'])
+                                                .update({"read": true});
+                                            Navigator.pop(context);
+                                          },
+                                          title: const Text("Marquer comme lu"),
+                                        ),
+                                        const Divider(),
+                                        ListTile(
+                                          onTap: () {
+                                            FirebaseFirestore.instance
+                                                .collection("Notifications")
+                                                .doc(data['id'])
+                                                .delete();
+                                            Navigator.pop(context);
+                                          },
+                                          title: const Text(
+                                            "Supprimer",
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        )
+                                      ]),
+                                    ));
+                              });
+                        },
                         contentPadding: const EdgeInsets.all(10),
                         isThreeLine: true,
                         leading: CircleAvatar(
@@ -114,15 +160,28 @@ class _PNotifPageState extends State<PNotifPage> {
                                               Radius.circular(15))),
                                       content: SizedBox(
                                         height: 128,
-                                        child: Column(children: const [
+                                        child: Column(children: [
                                           ListTile(
-                                            tileColor: kPrimaryLightColor,
-                                            title: Text("Marquer comme lu"),
+                                            onTap: () {
+                                              FirebaseFirestore.instance
+                                                  .collection("Notifications")
+                                                  .doc(data['id'])
+                                                  .update({"read": true});
+                                              Navigator.pop(context);
+                                            },
+                                            title:
+                                                const Text("Marquer comme lu"),
                                           ),
-                                          Divider(),
+                                          const Divider(),
                                           ListTile(
-                                            tileColor: kPrimaryLightColor,
-                                            title: Text(
+                                            onTap: () {
+                                              FirebaseFirestore.instance
+                                                  .collection("Notifications")
+                                                  .doc(data['id'])
+                                                  .delete();
+                                              Navigator.pop(context);
+                                            },
+                                            title: const Text(
                                               "Supprimer",
                                               style: TextStyle(
                                                   color: Colors.red,

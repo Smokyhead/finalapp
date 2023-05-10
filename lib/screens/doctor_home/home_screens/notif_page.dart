@@ -135,7 +135,8 @@ class _DNotifPageState extends State<DNotifPage> {
                                       'content':
                                           "Votre demande pour rendez-vous avec Dr ${data['doctorFirstName']} ${data['doctorLastName']} le ${data['date']} à ${data['time']} est confirmée",
                                       'dateTime': dateTime,
-                                      'appointmentId': data['id']
+                                      'appointmentId': data['id'],
+                                      'id': uuid1
                                     });
                                   },
                                   icon: const Icon(
@@ -167,7 +168,8 @@ class _DNotifPageState extends State<DNotifPage> {
                                       'content':
                                           "Votre demande pour rendez-vous avec Dr ${data['doctorFirstName']} ${data['doctorLastName']} le ${data['date']} à ${data['time']} est refusée",
                                       'dateTime': dateTime,
-                                      'appointmentId': data['id']
+                                      'appointmentId': data['id'],
+                                      'id': uuid2
                                     });
                                   },
                                   icon: const Icon(

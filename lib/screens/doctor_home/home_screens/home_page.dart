@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
 import 'package:finalapp/screens/patient_home/widgets/consultation_card.dart';
-import 'package:finalapp/screens/patient_home/widgets/title_bar.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -114,7 +113,27 @@ class Body extends StatelessWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                const TitleBar(title: "Consultations à venir"),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Consultations à venir",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Scaffold()));
+                        },
+                        icon: const Icon(
+                          Icons.arrow_right_alt,
+                          size: 33,
+                        )),
+                  ],
+                ),
                 const SizedBox(
                   height: 20,
                 ),
@@ -185,7 +204,27 @@ class Body extends StatelessWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                const TitleBar(title: "Mes Services"),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Mes Services",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Scaffold()));
+                        },
+                        icon: const Icon(
+                          Icons.arrow_right_alt,
+                          size: 33,
+                        )),
+                  ],
+                ),
                 const SizedBox(
                   height: 5,
                 ),
@@ -202,7 +241,27 @@ class Body extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
-                const TitleBar(title: "Mes Patients"),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Mes Patients",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Scaffold()));
+                        },
+                        icon: const Icon(
+                          Icons.arrow_right_alt,
+                          size: 33,
+                        )),
+                  ],
+                ),
                 const SizedBox(
                   height: 20,
                 ),

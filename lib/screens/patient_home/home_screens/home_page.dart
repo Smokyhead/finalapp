@@ -1,10 +1,14 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/patient_home/doctor_profile.dart';
+import 'package:finalapp/screens/patient_home/home_screens/doctors_list.dart';
 import 'package:finalapp/screens/patient_home/widgets/consultation_card.dart';
-import 'package:finalapp/screens/patient_home/widgets/title_bar.dart';
+import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -116,7 +120,27 @@ class Body extends StatelessWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                const TitleBar(title: "Consultations à venir"),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Consultations à venir",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Scaffold()));
+                        },
+                        icon: const Icon(
+                          Icons.arrow_right_alt,
+                          size: 33,
+                        )),
+                  ],
+                ),
                 const SizedBox(
                   height: 20,
                 ),
@@ -187,7 +211,27 @@ class Body extends StatelessWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                const TitleBar(title: "Mes Docteurs"),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Mes Docteurs",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const DoctorsList()));
+                        },
+                        icon: const Icon(
+                          Icons.arrow_right_alt,
+                          size: 33,
+                        )),
+                  ],
+                ),
                 const SizedBox(
                   height: 20,
                 ),
@@ -219,41 +263,72 @@ class Body extends StatelessWidget {
                     } else {
                       return SizedBox(
                         height: 145,
-                        child: ListView.separated(
+                        child: ListView.builder(
                           scrollDirection: Axis.horizontal,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(width: 20),
                           itemCount: docs.length,
                           itemBuilder: (context, index) {
                             var data =
                                 docs[index].data() as Map<String, dynamic>;
-                            return Column(
-                              children: [
-                                Container(
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey,
-                                        spreadRadius: 0.005,
-                                        blurRadius: 10,
-                                      )
-                                    ],
+                            return ElevatedButton(
+                              style: const ButtonStyle(
+                                  elevation: MaterialStatePropertyAll(0),
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Colors.transparent)),
+                              onPressed: () {
+                                final id = data['userUID'];
+                                print(id);
+                                FirestoreServices.getDoctorById(id);
+                                showDialog(
+                                    context: (context),
+                                    builder: (BuildContext context) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(
+                                          color: kPrimaryColor,
+                                        ),
+                                      );
+                                    });
+                                Timer(const Duration(seconds: 1), () {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const DoctorProfile()));
+                                });
+                              },
+                              child: Column(
+                                children: [
+                                  Container(
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey,
+                                          spreadRadius: 0.005,
+                                          blurRadius: 10,
+                                        )
+                                      ],
+                                    ),
+                                    child: CircleAvatar(
+                                      backgroundColor: Colors.grey,
+                                      radius: 50,
+                                      backgroundImage: const AssetImage(
+                                          "assets/images/avatar.jpg"),
+                                      foregroundImage: data['imageUrl'].isEmpty
+                                          ? null
+                                          : NetworkImage(data['imageUrl']),
+                                    ),
                                   ),
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.grey,
-                                    radius: 50,
-                                    backgroundImage: const AssetImage(
-                                        "assets/images/avatar.jpg"),
-                                    foregroundImage: data['imageUrl'].isEmpty
-                                        ? null
-                                        : NetworkImage(data['imageUrl']),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    data['firstName'],
+                                    style: const TextStyle(color: Colors.black),
                                   ),
-                                ),
-                                const SizedBox(height: 5),
-                                Text(data['firstName']),
-                                Text(data['lastName']),
-                              ],
+                                  Text(
+                                    data['lastName'],
+                                    style: const TextStyle(color: Colors.black),
+                                  ),
+                                ],
+                              ),
                             );
                           },
                         ),

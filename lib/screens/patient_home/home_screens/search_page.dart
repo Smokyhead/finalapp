@@ -25,45 +25,48 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(15),
-        )),
-        elevation: 5,
-        backgroundColor: kPrimaryColor,
-        foregroundColor: Colors.white,
-        title: typing
-            ? SizedBox(
-                height: 35,
-                child: TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      name = value;
-                    });
-                  },
-                  style: const TextStyle(color: Colors.black, fontSize: 20),
-                  cursorColor: Colors.black,
-                  controller: searchCont,
-                  decoration: const InputDecoration(
-                      contentPadding: EdgeInsets.only(top: 10, left: 15),
-                      fillColor: Color.fromARGB(255, 255, 255, 255),
-                      filled: true,
-                      border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.all(Radius.circular(30))),
-                      hintText: 'Search',
-                      hintStyle: TextStyle(color: Colors.black, fontSize: 20)),
-                ),
-              )
-            : const Text("Recherche"),
-        leading: IconButton(
-          icon: Icon(typing ? Icons.done : IconlyLight.search),
-          onPressed: () {
-            setState(() {
-              typing = !typing;
-            });
-          },
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: AppBar(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(15),
+          )),
+          elevation: 5,
+          backgroundColor: kPrimaryColor,
+          foregroundColor: Colors.white,
+          title: typing
+              ? SizedBox(
+                  height: 35,
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        name = value;
+                      });
+                    },
+                    style: const TextStyle(color: Colors.black, fontSize: 20),
+                    cursorColor: Colors.black,
+                    controller: searchCont,
+                    decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.only(top: 10, left: 15),
+                        fillColor: Color.fromARGB(255, 255, 255, 255),
+                        filled: true,
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.all(Radius.circular(30))),
+                        hintText: 'Search',
+                        hintStyle: TextStyle(color: Colors.black, fontSize: 20)),
+                  ),
+                )
+              : const Text("Recherche"),
+          leading: IconButton(
+            icon: Icon(typing ? Icons.done : IconlyLight.search),
+            onPressed: () {
+              setState(() {
+                typing = !typing;
+              });
+            },
+          ),
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(

@@ -1,5 +1,4 @@
 import 'package:finalapp/constants.dart';
-import 'package:finalapp/models/users.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 
@@ -59,7 +58,7 @@ class ConsultationCard extends StatelessWidget {
                     backgroundImage:
                         const AssetImage("assets/images/avatar.jpg"),
                     foregroundImage:
-                        Doctor.imageUrl.isEmpty ? null : NetworkImage(imageUrl),
+                        imageUrl.isEmpty ? null : NetworkImage(imageUrl),
                   ),
                 ),
                 Column(
