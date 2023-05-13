@@ -1,8 +1,13 @@
+// ignore_for_file: avoid_print
+
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/patient_home/doctor_profile.dart';
+import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
-import 'package:iconly/iconly.dart';
 
 class DoctorsList extends StatefulWidget {
   const DoctorsList({super.key});
@@ -24,18 +29,7 @@ class _DoctorsListState extends State<DoctorsList> {
           )),
           backgroundColor: kPrimaryColor,
           foregroundColor: Colors.white,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(IconlyLight.arrow_left)),
-          title: const Text("Notifications"),
-          actions: const [
-            Icon(IconlyBroken.profile),
-            SizedBox(
-              width: 20,
-            )
-          ],
+          title: const Text("Mes Docteurs"),
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -78,6 +72,27 @@ class _DoctorsListState extends State<DoctorsList> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
                       child: ListTile(
+                        onTap: () {
+                          final id = data['userUID'];
+                          print(id);
+                          FirestoreServices.getDoctorById(id);
+                          showDialog(
+                              context: (context),
+                              builder: (BuildContext context) {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    color: kPrimaryColor,
+                                  ),
+                                );
+                              });
+                          Timer(const Duration(seconds: 1), () {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const DoctorProfile()));
+                          });
+                        },
                         contentPadding: const EdgeInsets.all(10),
                         leading: CircleAvatar(
                           radius: 30,
@@ -90,7 +105,7 @@ class _DoctorsListState extends State<DoctorsList> {
                               : NetworkImage(data['imageUrl']),
                         ),
                         title: Text(
-                            "${data['firstName']} ${data['lastName']}\n${data['phone']}"),
+                            "Dr ${data['firstName']} ${data['lastName']}\n${data['phone']}"),
                         subtitle: Text(data['services'].toString().substring(
                             1, (data['services'].toString().length) - 1)),
                       ),

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/doctor_home/home_screens/consultations_list_doctor.dart';
+import 'package:finalapp/screens/doctor_home/home_screens/patients_list.dart';
 import 'package:finalapp/screens/patient_home/widgets/consultation_card.dart';
 import 'package:flutter/material.dart';
 
@@ -123,10 +125,10 @@ class Body extends StatelessWidget {
                     ),
                     IconButton(
                         onPressed: () {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Scaffold()));
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (BuildContext context) {
+                            return const DConsultationsList();
+                          }));
                         },
                         icon: const Icon(
                           Icons.arrow_right_alt,
@@ -214,10 +216,10 @@ class Body extends StatelessWidget {
                     ),
                     IconButton(
                         onPressed: () {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Scaffold()));
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (BuildContext context) {
+                            return const Scaffold();
+                          }));
                         },
                         icon: const Icon(
                           Icons.arrow_right_alt,
@@ -251,10 +253,10 @@ class Body extends StatelessWidget {
                     ),
                     IconButton(
                         onPressed: () {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Scaffold()));
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (BuildContext context) {
+                            return const PatientsList();
+                          }));
                         },
                         icon: const Icon(
                           Icons.arrow_right_alt,

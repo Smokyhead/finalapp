@@ -80,10 +80,14 @@ class ConsultationCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "$firstName $lastName",
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Text(
+                    "$firstName $lastName",
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                    maxLines: 1,
+                  ),
                 ),
               ],
             ),

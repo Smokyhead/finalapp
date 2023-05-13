@@ -33,6 +33,7 @@ class _PNotifPageState extends State<PNotifPage> {
         stream: FirebaseFirestore.instance
             .collection("Notifications")
             .where('patient', isEqualTo: Patient.uid)
+            .orderBy('dateTime', descending: true)
             .snapshots(),
         builder: (context, snapshots) {
           if (snapshots.connectionState == ConnectionState.waiting) {
