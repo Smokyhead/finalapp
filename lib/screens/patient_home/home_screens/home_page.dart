@@ -193,6 +193,12 @@ class _HomePageState extends State<HomePage> {
                                 date: data['date'],
                                 time: data['time'],
                                 lastName: data['doctorLastName'],
+                                doctorPhone: data['doctorPhone'],
+                                doctorid: data['doctorId'],
+                                id: data['id'],
+                                patientPhone: data['patientPhone'],
+                                patientid: data['patientId'],
+                                role: 'patient',
                               );
                             },
                           ),

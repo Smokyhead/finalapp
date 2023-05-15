@@ -48,10 +48,22 @@ class _ResetPassword extends State<ResetPassword> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
                 content: const Text(
                     "Email envoyé!\nvérifier votre boîte de réception"),
                 actions: [
                   ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(kPrimaryColor),
+                        foregroundColor:
+                            MaterialStateProperty.all(Colors.white),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
+                        ),
+                      ),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -127,6 +139,7 @@ class _ResetPassword extends State<ResetPassword> {
                   _verifyEmail();
                 },
                 style: ButtonStyle(
+                  elevation: MaterialStateProperty.all(5),
                   backgroundColor: MaterialStateProperty.all(kPrimaryColor),
                   foregroundColor: MaterialStateProperty.all(Colors.white),
                   shape: MaterialStateProperty.all(
@@ -146,6 +159,7 @@ class _ResetPassword extends State<ResetPassword> {
                   Navigator.pop(context);
                 },
                 style: ButtonStyle(
+                  elevation: MaterialStateProperty.all(5),
                   backgroundColor: MaterialStateProperty.all(kPrimaryColor),
                   foregroundColor: MaterialStateProperty.all(Colors.white),
                   shape: MaterialStateProperty.all(

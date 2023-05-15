@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
+import 'package:finalapp/models/services.dart';
 import 'package:finalapp/models/users.dart';
 import 'package:finalapp/screens/auth/Doctor_Login/doctor_login_screen.dart';
 import 'package:finalapp/screens/auth/Patient_Signup/Components/background_signup.dart';
@@ -23,38 +24,10 @@ class _BodyState extends State<Body> {
   List<String> selectedItems = [];
 
   void _showMultiSelect() async {
-    final List<String> items = [
-      "chirurgie viscérale",
-      "chirurgie générale",
-      "chirurgie cardio- vasculaire et thoracique",
-      "chirurgie vasculaire périphérique",
-      "orthopédie",
-      "traumatologie",
-      "urologie",
-      "oto-rhino-laryngologie",
-      "chirurgie maxillo-faciale",
-      "ophtalmologie",
-      "neurochirurgie",
-      "gynécologie obstétrique",
-      "médecine et chirurgie dentaire",
-      "cardiologie",
-      "gastro-entérologie",
-      "anesthésie réanimation",
-      "pneumo allergologie",
-      "néphrologie",
-      "endocrinologie",
-      "neurologie",
-      "psychiatrie",
-      "dermatologie",
-      "pédiatrie",
-      "néonatologie",
-      "hématologie",
-    ];
-
     final List<String>? results = await showDialog(
         context: context,
         builder: (BuildContext context) {
-          return MultiSelect(items: items);
+          return MultiSelect(items: Services.items);
         });
 
     if (results != null) {

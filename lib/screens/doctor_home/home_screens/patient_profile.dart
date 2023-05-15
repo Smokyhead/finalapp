@@ -1,24 +1,39 @@
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
+import 'package:finalapp/models/description_model.dart';
 import 'package:finalapp/models/users.dart';
-import 'package:finalapp/screens/patient_home/widgets/appointment.dart';
+import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
-class DoctorProfile extends StatefulWidget {
-  const DoctorProfile({super.key});
+class PatientProfile extends StatefulWidget {
+  const PatientProfile({super.key});
 
   @override
-  State<StatefulWidget> createState() => _DoctorProfileState();
+  State<StatefulWidget> createState() => _PatientProfileState();
 }
 
-class _DoctorProfileState extends State<DoctorProfile> {
-  final myController = TextEditingController();
+class _PatientProfileState extends State<PatientProfile> {
+  TextEditingController myController = TextEditingController();
+  bool typing = false;
   String uuid = "";
 
-  Future submitFeedback() async {
+  Future updateDescription() async {
+    FirebaseFirestore.instance
+        .collection("PatientsDescriptions")
+        .doc(Description.id)
+        .update({"description": myController.text});
+    FirestoreServices.getDescriptionById(uuid);
+    setState(() {
+      myController.text = Description.description;
+    });
+  }
+
+  Future submitDescription() async {
     if (myController.text.isEmpty) {
       showDialog(
           context: context,
@@ -50,22 +65,29 @@ class _DoctorProfileState extends State<DoctorProfile> {
           });
     } else {
       uuid = const Uuid().v4();
-      FirebaseFirestore.instance.collection("Feedbacks").doc(uuid).set({
+      FirebaseFirestore.instance
+          .collection("PatientsDescriptions")
+          .doc(uuid)
+          .set({
         "id": uuid,
         "patientId": Patient.uid,
-        "patientName": "${Patient.firstName} ${Patient.lastName}",
         "doctorId": Doctor.uid,
-        "doctorName": "${Doctor.firstName} ${Doctor.lastName}",
-        "feedback": myController.text
+        "description": myController.text
       });
-      FirebaseFirestore.instance.collection('Doctors').doc(Doctor.uid).update({
-        'feedbacks': FieldValue.arrayUnion([uuid])
+      FirestoreServices.getDescriptionById(uuid);
+      setState(() {
+        myController.text = Description.description;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    FirestoreServices.getDescription(Doctor.uid, Patient.uid);
+    print(Description.id);
+    if (Description.id.isNotEmpty) {
+      myController.text = Description.description;
+    }
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(
@@ -103,15 +125,15 @@ class _DoctorProfileState extends State<DoctorProfile> {
                     radius: 90,
                     backgroundImage:
                         const AssetImage("assets/images/avatar.jpg"),
-                    foregroundImage: Doctor.imageUrl.isEmpty
+                    foregroundImage: Patient.imageUrl.isEmpty
                         ? null
-                        : NetworkImage(Doctor.imageUrl),
+                        : NetworkImage(Patient.imageUrl),
                   ),
                   const SizedBox(
                     height: 35,
                   ),
                   Text(
-                    "${Doctor.firstName} ${Doctor.lastName}",
+                    "${Patient.firstName} ${Patient.lastName}",
                     style: const TextStyle(
                         color: kPrimaryColor,
                         fontSize: 30,
@@ -136,7 +158,7 @@ class _DoctorProfileState extends State<DoctorProfile> {
                         width: 20,
                       ),
                       Text(
-                        Doctor.phone,
+                        Patient.phone,
                         style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 20),
                       )
@@ -158,7 +180,7 @@ class _DoctorProfileState extends State<DoctorProfile> {
                         ),
                         onPressed: () async {
                           final Uri url =
-                              Uri(scheme: 'tel', path: Doctor.phone);
+                              Uri(scheme: 'tel', path: Patient.phone);
                           launchUrl(url);
                         },
                         icon: const Icon(
@@ -187,7 +209,7 @@ class _DoctorProfileState extends State<DoctorProfile> {
                     width: 20,
                   ),
                   Text(
-                    Doctor.email,
+                    Patient.email,
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 20),
                   ),
@@ -200,28 +222,22 @@ class _DoctorProfileState extends State<DoctorProfile> {
               color: Colors.black,
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    const Text(
-                      "Services:",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                    ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    Wrap(
-                        spacing: 5,
-                        children: Doctor.services
-                            .map((e) => Chip(
-                                  label: Text(e),
-                                ))
-                            .toList()),
-                  ],
-                ),
+              padding: const EdgeInsets.all(30),
+              child: Row(
+                children: [
+                  const Icon(
+                    IconlyLight.calendar,
+                    size: 25,
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Text(
+                    Patient.dob,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                ],
               ),
             ),
             Container(
@@ -229,42 +245,72 @@ class _DoctorProfileState extends State<DoctorProfile> {
               height: 0.5,
               color: Colors.black,
             ),
-            const SizedBox(
-              height: 30,
-            ),
-            const Text("Reserver un rendez-vous"),
-            const SizedBox(
-              height: 10,
-            ),
-            SizedBox(
-              height: 60,
-              width: 130,
-              child: TextButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const AppointmentPage();
-                    }));
-                  },
-                  style: ButtonStyle(
-                    side: MaterialStateProperty.all(const BorderSide(
-                        style: BorderStyle.solid, color: kPrimaryColor)),
-                    elevation: MaterialStateProperty.all(6),
-                    backgroundColor:
-                        MaterialStateProperty.all(kPrimaryLightColor),
-                    foregroundColor: MaterialStateProperty.all(kPrimaryColor),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                    ),
+            Padding(
+              padding: const EdgeInsets.only(left: 35, right: 35, top: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Description",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
-                  child: const Text(
-                    "Reserver",
-                    style: TextStyle(fontSize: 23.5),
-                  )),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Container(
+                      child: typing
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      if (Description.description.isEmpty) {
+                                        submitDescription();
+                                      } else {
+                                        updateDescription();
+                                      }
+                                    },
+                                    icon: const Icon(Icons.done)),
+                                IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        typing = !typing;
+                                      });
+                                    },
+                                    icon: const Icon(Icons.close))
+                              ],
+                            )
+                          : IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  typing = !typing;
+                                });
+                              },
+                              icon: const Icon(IconlyLight.edit))),
+                ],
+              ),
             ),
             const SizedBox(
-              height: 10,
+              height: 15,
+            ),
+            Container(
+              child: typing
+                  ? TextFieldContainer(
+                      child: TextField(
+                        textCapitalization: TextCapitalization.sentences,
+                        controller: myController,
+                        keyboardType: TextInputType.multiline,
+                        maxLines: 6,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Description",
+                        ),
+                      ),
+                    )
+                  : checkIfNull(),
+            ),
+            const SizedBox(
+              height: 25,
             ),
             SizedBox(
               height: 60,
@@ -290,79 +336,34 @@ class _DoctorProfileState extends State<DoctorProfile> {
                     style: TextStyle(fontSize: 23.5),
                   )),
             ),
-            TextButton(
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text(
-                            "Comment vous trouvez ce docteur?",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 17),
-                          ),
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20))),
-                          content: TextFieldContainer(
-                            child: TextField(
-                              textCapitalization: TextCapitalization.sentences,
-                              controller: myController,
-                              keyboardType: TextInputType.multiline,
-                              maxLines: 6,
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Tapez votre réponse ici",
-                              ),
-                            ),
-                          ),
-                          actions: [
-                            ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all(kPrimaryColor),
-                                  foregroundColor:
-                                      MaterialStateProperty.all(Colors.white),
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30)),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text("Annuler")),
-                            ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all(kPrimaryColor),
-                                  foregroundColor:
-                                      MaterialStateProperty.all(Colors.white),
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30)),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  submitFeedback();
-                                  Navigator.pop(context);
-                                },
-                                child: const Text("Valider"))
-                          ],
-                        );
-                      });
-                },
-                child: const Text(
-                  "Ajoutez un feedback",
-                  style: TextStyle(
-                      color: kPrimaryColor, fontWeight: FontWeight.bold),
-                ))
           ],
         ),
       ),
     );
+  }
+
+  checkIfNull() {
+    var size = MediaQuery.of(context).size;
+    if (Description.id != "") {
+      return Container(
+          width: size.width * 0.8,
+          height: 100,
+          decoration: BoxDecoration(
+              boxShadow: const [
+                BoxShadow(color: Colors.grey, blurRadius: 10, spreadRadius: 10)
+              ],
+              color: kPrimaryLightColor,
+              borderRadius: BorderRadius.circular(5),
+              border:
+                  Border.all(color: const Color.fromARGB(255, 219, 223, 224))),
+          child: Text(Description.description));
+    } else {
+      return const Text(
+        "Aucune description à afficher",
+        style: TextStyle(
+            color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 18),
+      );
+    }
   }
 }
 

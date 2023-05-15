@@ -8,6 +8,7 @@ import 'package:finalapp/models/users.dart';
 import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PatientsList extends StatefulWidget {
   const PatientsList({super.key});
@@ -162,7 +163,11 @@ class _PatientsListState extends State<PatientsList> {
                               radius: 20,
                               backgroundColor: Colors.green,
                               child: IconButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final Uri url =
+                                      Uri(scheme: 'tel', path: data['phone']);
+                                  launchUrl(url);
+                                },
                                 icon: const Icon(
                                   IconlyBold.call,
                                   size: 20,

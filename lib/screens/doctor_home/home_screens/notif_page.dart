@@ -23,6 +23,10 @@ class _DNotifPageState extends State<DNotifPage> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
         child: AppBar(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(15),
+          )),
           automaticallyImplyLeading: false,
           backgroundColor: kPrimaryColor,
           foregroundColor: Colors.white,
@@ -104,16 +108,23 @@ class _DNotifPageState extends State<DNotifPage> {
                                 backgroundColor: Colors.green,
                                 child: IconButton(
                                   onPressed: () {
+                                    final uuid1 = const Uuid().v4();
+                                    final uuid3 = const Uuid().v4();
+                                    final uuid4 = const Uuid().v4();
                                     FirebaseFirestore.instance
                                         .collection("Appointments")
                                         .doc(data['id'])
-                                        .update({"isApproved": true});
+                                        .update({
+                                      "isApproved": true,
+                                      'prescriptionId': uuid4,
+                                      'billId': uuid3
+                                    });
                                     FirebaseFirestore.instance
                                         .collection('Doctors')
                                         .doc(Doctor.uid)
                                         .update({
                                       'patients': FieldValue.arrayUnion(
-                                          [data['patientId']])
+                                          [data['patientId']]),
                                     });
                                     FirebaseFirestore.instance
                                         .collection('Patients')
@@ -122,7 +133,6 @@ class _DNotifPageState extends State<DNotifPage> {
                                       'doctors':
                                           FieldValue.arrayUnion([Doctor.uid])
                                     });
-                                    final uuid1 = const Uuid().v4();
                                     FirebaseFirestore.instance
                                         .collection('Notifications')
                                         .doc(uuid1)
@@ -137,6 +147,24 @@ class _DNotifPageState extends State<DNotifPage> {
                                       'dateTime': dateTime,
                                       'appointmentId': data['id'],
                                       'id': uuid1
+                                    });
+
+                                    FirebaseFirestore.instance
+                                        .collection('Bills')
+                                        .doc(uuid3)
+                                        .set({
+                                      'id': uuid3,
+                                      'consultId': data['id'],
+                                      'fee': 0,
+                                    });
+
+                                    FirebaseFirestore.instance
+                                        .collection('Prescreptions')
+                                        .doc(uuid4)
+                                        .set({
+                                      'id': uuid4,
+                                      'consultId': data['id'],
+                                      'meds': [],
                                     });
                                   },
                                   icon: const Icon(

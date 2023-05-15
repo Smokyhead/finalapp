@@ -93,7 +93,11 @@ class _AppointmentPageState extends State<AppointmentPage> {
           "doctorImageUrl": Doctor.imageUrl,
           "patientImageUrl": Patient.imageUrl,
           "dateTime": dateTime,
-          "status": "upcoming"
+          "status": "upcoming",
+          "doctorPhone": Doctor.phone,
+          "patientPhone": Patient.phone,
+          "billId": "",
+          "prescriptionId": ""
         });
         showDialog(
             context: (context),

@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/models/appoint_model.dart';
+import 'package:finalapp/models/description_model.dart';
 import 'package:finalapp/models/users.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -19,23 +20,26 @@ class FirestoreServices {
     }
   }
 
-  static Future<List<Appointment>> getAppointmentsForPatient(
-      String patientId) async {
-    late final Map<String, dynamic> data;
-    final snapshot = await FirebaseFirestore.instance
-        .collection('Appointments')
-        .where('patientId', isEqualTo: patientId)
-        .get();
+  static Future<void> getappointById(String id) async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('Appointments')
+          .doc(id)
+          .get();
 
-    final appointments = snapshot.docs.map((doc) {
-      data = doc.data();
-      print(data.toString());
-      return Appointment.fromMap(data);
-    }).toList();
-    if (appointments != []) {
-      print("there is nothing bro");
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+
+        print("this is the DATA: $data");
+        Appointment.fromMap(data);
+        print("DONE!!!");
+      } else {
+        print('appoin not found');
+      }
+    } catch (e) {
+      print(e.toString());
+      print("something went wrong!!");
     }
-    return appointments;
   }
 
   static Future<void> getDoctorById(String doctorId) async {
@@ -75,6 +79,49 @@ class FirestoreServices {
         print("DONE!!!");
       } else {
         print('Patient not found');
+      }
+    } catch (e) {
+      print(e.toString());
+      print("something went wrong!!");
+    }
+  }
+
+  static Future<void> getDescriptionById(String id) async {
+    try {
+      final snapshot = await FirebaseFirestore.instance.doc(id).get();
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+
+        print("this is the DATA: $data");
+        Description.fromMap(data);
+        print("DONE!!!");
+      } else {
+        print('des not found');
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  static Future<void> getDescription(String dId, String pId) async {
+    late final Map<String, dynamic> data;
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('Descriptions')
+          .where('patientId', isEqualTo: pId)
+          .where('doctorId', isEqualTo: dId)
+          .get();
+      final list = snapshot.docs.map((doc) {
+        data = doc.data();
+        print(data.toString());
+      }).toList();
+      final data1 = list[0];
+      if (list != []) {
+        print("this is the DATA: $data");
+        Description.fromMap(data1);
+        print("DONE!!!");
+      } else {
+        print('Not found');
       }
     } catch (e) {
       print(e.toString());

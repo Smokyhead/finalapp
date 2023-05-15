@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/doctor_home/appointment_page.dart';
+import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 
@@ -197,7 +201,9 @@ class _DConsultationsListState extends State<DConsultationsList> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20)),
                               child: ListTile(
-                                onTap: () {},
+                                onTap: () {
+                                  toAppointPage(data['id']);
+                                },
                                 contentPadding: const EdgeInsets.all(5),
                                 leading: CircleAvatar(
                                   radius: 30,
@@ -329,7 +335,9 @@ class _DConsultationsListState extends State<DConsultationsList> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
                     child: ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        toAppointPage(data['id']);
+                      },
                       contentPadding: const EdgeInsets.all(5),
                       leading: CircleAvatar(
                         radius: 30,
@@ -461,7 +469,9 @@ class _DConsultationsListState extends State<DConsultationsList> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
                     child: ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        toAppointPage(data['id']);
+                      },
                       contentPadding: const EdgeInsets.all(5),
                       leading: CircleAvatar(
                         radius: 30,
@@ -538,5 +548,22 @@ class _DConsultationsListState extends State<DConsultationsList> {
         },
       );
     }
+  }
+
+  void toAppointPage(String id) {
+    FirestoreServices.getappointById(id);
+    showDialog(
+        context: (context),
+        builder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: kPrimaryColor,
+            ),
+          );
+        });
+    Timer(const Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const AppointPage()));
+    });
   }
 }

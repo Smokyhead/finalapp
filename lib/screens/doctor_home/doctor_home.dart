@@ -29,13 +29,11 @@ class _DoctorHomeState extends State<DoctorHome> {
         children: screens,
       ),
       bottomNavigationBar: StylishBottomBar(
-        elevation: 5,
-        borderRadius: BorderRadius.circular(20),
+        elevation: 10,
         backgroundColor: kPrimaryLightColor,
         option: AnimatedBarOptions(
             iconStyle: IconStyle.animated,
             barAnimation: BarAnimation.blink,
-            opacity: 0.8,
             backgroundColor: kPrimaryColor),
         items: [
           BottomBarItem(

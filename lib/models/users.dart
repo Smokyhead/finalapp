@@ -11,12 +11,12 @@ class Patient {
   static void fromMap(Map<String, dynamic> data) {
     firstName = data['firstName'] ?? '';
     lastName = data['lastName'] ?? '';
-    email = data['email'] ?? '';
+    email = data['userEmail'] ?? '';
     phone = data['phone'] ?? '';
     role = data['role'] ?? '';
     uid = data['userUID'] ?? '';
     dob = data['birthDate'] ?? '';
-    imageUrl = data['imageUrl'];
+    imageUrl = data['imageUrl'] ?? '';
   }
 }
 
@@ -38,7 +38,7 @@ class Doctor {
     role = data['role'] ?? '';
     uid = data['userUID'] ?? '';
     services = List<String>.from(data['services'] ?? []);
-    imageUrl = data['imageUrl'];
+    imageUrl = data['imageUrl'] ?? '';
   }
 }
 
