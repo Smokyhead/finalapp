@@ -24,9 +24,7 @@ class _BodyState extends State<Body> {
   late String id = "";
   final String role = "patient";
   final myController1 = TextEditingController();
-  String emailVal = "";
   final myController2 = TextEditingController();
-  String passwordVal = "";
   bool hidePassword = true;
   late String userID;
 
@@ -125,7 +123,8 @@ class _BodyState extends State<Body> {
       if (isPatient == true) {
         print(Patient.firstName);
         Navigator.pop(context);
-
+        UserState.isConnected = true;
+        Role.role = "patient";
         Navigator.push(context,
             MaterialPageRoute(builder: (BuildContext context) {
           return const PatientHome();
@@ -294,10 +293,6 @@ class _BodyState extends State<Body> {
               height: 60,
               child: TextButton(
                   onPressed: () {
-                    emailVal = myController1.text;
-                    print("email = $emailVal");
-                    passwordVal = myController2.text;
-                    print("password = $passwordVal");
                     formValidation();
                   },
                   style: ButtonStyle(

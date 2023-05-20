@@ -161,12 +161,12 @@ class _AppointmentPageState extends State<AppointmentPage> {
               );
             });
       }
-      uuid = "";
     }
   }
 
   @override
   void initState() {
+    uuid;
     formattedDate = "";
     formattedTime = "";
     super.initState();
@@ -295,7 +295,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        "Temps:",
+                        "Heure:",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),

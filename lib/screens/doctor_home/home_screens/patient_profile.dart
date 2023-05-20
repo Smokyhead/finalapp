@@ -1,14 +1,11 @@
 // ignore_for_file: avoid_print
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
-import 'package:finalapp/models/description_model.dart';
+import 'package:finalapp/models/observation_model.dart';
 import 'package:finalapp/models/users.dart';
-import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:uuid/uuid.dart';
 
 class PatientProfile extends StatefulWidget {
   const PatientProfile({super.key});
@@ -20,74 +17,10 @@ class PatientProfile extends StatefulWidget {
 class _PatientProfileState extends State<PatientProfile> {
   TextEditingController myController = TextEditingController();
   bool typing = false;
-  String uuid = "";
-
-  Future updateDescription() async {
-    FirebaseFirestore.instance
-        .collection("PatientsDescriptions")
-        .doc(Description.id)
-        .update({"description": myController.text});
-    FirestoreServices.getDescriptionById(uuid);
-    setState(() {
-      myController.text = Description.description;
-    });
-  }
-
-  Future submitDescription() async {
-    if (myController.text.isEmpty) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text(
-                "OOPS!",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-              ),
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(20))),
-              content: const Text("Veuillez remplir le champ vide."),
-              actions: [
-                ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(kPrimaryColor),
-                      foregroundColor: MaterialStateProperty.all(Colors.white),
-                      shape: MaterialStateProperty.all(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30)),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("OK"))
-              ],
-            );
-          });
-    } else {
-      uuid = const Uuid().v4();
-      FirebaseFirestore.instance
-          .collection("PatientsDescriptions")
-          .doc(uuid)
-          .set({
-        "id": uuid,
-        "patientId": Patient.uid,
-        "doctorId": Doctor.uid,
-        "description": myController.text
-      });
-      FirestoreServices.getDescriptionById(uuid);
-      setState(() {
-        myController.text = Description.description;
-      });
-    }
-  }
+  TextEditingController cont = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    FirestoreServices.getDescription(Doctor.uid, Patient.uid);
-    print(Description.id);
-    if (Description.id.isNotEmpty) {
-      myController.text = Description.description;
-    }
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(
@@ -263,13 +196,7 @@ class _PatientProfileState extends State<PatientProfile> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 IconButton(
-                                    onPressed: () {
-                                      if (Description.description.isEmpty) {
-                                        submitDescription();
-                                      } else {
-                                        updateDescription();
-                                      }
-                                    },
+                                    onPressed: () {},
                                     icon: const Icon(Icons.done)),
                                 IconButton(
                                     onPressed: () {
@@ -344,7 +271,7 @@ class _PatientProfileState extends State<PatientProfile> {
 
   checkIfNull() {
     var size = MediaQuery.of(context).size;
-    if (Description.id != "") {
+    if (Observation.id != "") {
       return Container(
           width: size.width * 0.8,
           height: 100,
@@ -356,7 +283,7 @@ class _PatientProfileState extends State<PatientProfile> {
               borderRadius: BorderRadius.circular(5),
               border:
                   Border.all(color: const Color.fromARGB(255, 219, 223, 224))),
-          child: Text(Description.description));
+          child: Text(Observation.observation));
     } else {
       return const Text(
         "Aucune description à afficher",

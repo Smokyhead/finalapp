@@ -17,8 +17,33 @@ class DNotifPage extends StatefulWidget {
 class _DNotifPageState extends State<DNotifPage> {
   final DateTime dateTime = DateTime.now();
 
+  Future<bool> checkObservationExists(String patientId, String doctorId) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('Observations')
+        .where('patientId', isEqualTo: patientId)
+        .where('doctorId', isEqualTo: doctorId)
+        .where('observation', isEqualTo: '')
+        .limit(1)
+        .get();
+
+    return snapshot.size > 0;
+  }
+
+  Future<void> createObservation(String patientId, String doctorId) async {
+    final uuid = const Uuid().v4();
+    FirebaseFirestore.instance.collection('Observations').doc(uuid).set({
+      'id': uuid,
+      'patientId': patientId,
+      'doctorId': doctorId,
+      'observation': '',
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      DNotifPage.notifNumber;
+    });
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
@@ -49,6 +74,7 @@ class _DNotifPageState extends State<DNotifPage> {
           }
           final docs = snapshots.data?.docs;
           DNotifPage.notifNumber = snapshots.data!.docs.length;
+
           if (docs == null || docs.isEmpty) {
             return const Center(
               child: Text(
@@ -61,157 +87,167 @@ class _DNotifPageState extends State<DNotifPage> {
               ),
             );
           } else {
-            return SizedBox(
-                height: 170,
-                child: ListView.separated(
-                    separatorBuilder: (context, index) => const Divider(),
-                    itemCount: snapshots.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      var data = snapshots.data!.docs[index].data()
-                          as Map<String, dynamic>;
-                      return ListTile(
-                        isThreeLine: true,
-                        leading: CircleAvatar(
-                          radius: 30,
-                          backgroundColor:
-                              const Color.fromARGB(255, 203, 203, 203),
-                          backgroundImage:
-                              const AssetImage("assets/images/avatar.jpg"),
-                          foregroundImage: data['patientImageUrl'].isEmpty
-                              ? null
-                              : NetworkImage(data['patientImageUrl']),
-                        ),
-                        title: Text(
-                          "${data['patientFirstName']} ${data['patientLastName']}",
-                          maxLines: 1,
-                          style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                          "Le: ${data['date']}\nà: ${data['time']}",
-                          maxLines: 2,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 15,
-                          ),
-                        ),
-                        trailing: SizedBox(
-                          height: 50,
-                          width: 80,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              CircleAvatar(
-                                radius: 15,
-                                backgroundColor: Colors.green,
-                                child: IconButton(
-                                  onPressed: () {
-                                    final uuid1 = const Uuid().v4();
-                                    final uuid3 = const Uuid().v4();
-                                    final uuid4 = const Uuid().v4();
-                                    FirebaseFirestore.instance
-                                        .collection("Appointments")
-                                        .doc(data['id'])
-                                        .update({
-                                      "isApproved": true,
-                                      'prescriptionId': uuid4,
-                                      'billId': uuid3
-                                    });
-                                    FirebaseFirestore.instance
-                                        .collection('Doctors')
-                                        .doc(Doctor.uid)
-                                        .update({
-                                      'patients': FieldValue.arrayUnion(
-                                          [data['patientId']]),
-                                    });
-                                    FirebaseFirestore.instance
-                                        .collection('Patients')
-                                        .doc(data['patientId'])
-                                        .update({
-                                      'doctors':
-                                          FieldValue.arrayUnion([Doctor.uid])
-                                    });
-                                    FirebaseFirestore.instance
-                                        .collection('Notifications')
-                                        .doc(uuid1)
-                                        .set({
-                                      'read': false,
-                                      'patient': data['patientId'],
-                                      'doctor': data['doctorId'],
-                                      'doctorImage': data['doctorImageUrl'],
-                                      'title': "Confirmation",
-                                      'content':
-                                          "Votre demande pour rendez-vous avec Dr ${data['doctorFirstName']} ${data['doctorLastName']} le ${data['date']} à ${data['time']} est confirmée",
-                                      'dateTime': dateTime,
-                                      'appointmentId': data['id'],
-                                      'id': uuid1
-                                    });
+            return ListView.separated(
+                separatorBuilder: (context, index) => const Divider(),
+                itemCount: snapshots.data!.docs.length,
+                itemBuilder: (context, index) {
+                  var data = snapshots.data!.docs[index].data()
+                      as Map<String, dynamic>;
+                  return ListTile(
+                    onTap: () async {},
+                    isThreeLine: true,
+                    leading: CircleAvatar(
+                      radius: 30,
+                      backgroundColor: const Color.fromARGB(255, 203, 203, 203),
+                      backgroundImage:
+                          const AssetImage("assets/images/avatar.jpg"),
+                      foregroundImage: data['patientImageUrl'].isEmpty
+                          ? null
+                          : NetworkImage(data['patientImageUrl']),
+                    ),
+                    title: Text(
+                      "${data['patientFirstName']} ${data['patientLastName']}",
+                      maxLines: 1,
+                      style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      "Le: ${data['date']}\nà: ${data['time']}",
+                      maxLines: 2,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                      ),
+                    ),
+                    trailing: SizedBox(
+                      height: 50,
+                      width: 80,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CircleAvatar(
+                            radius: 15,
+                            backgroundColor: Colors.green,
+                            child: IconButton(
+                              onPressed: () async {
+                                final uuid1 = const Uuid().v4();
+                                final uuid3 = const Uuid().v4();
+                                final uuid4 = const Uuid().v4();
+                                FirebaseFirestore.instance
+                                    .collection("Appointments")
+                                    .doc(data['id'])
+                                    .update({
+                                  "isApproved": true,
+                                  'prescriptionId': uuid4,
+                                  'billId': uuid3
+                                });
+                                FirebaseFirestore.instance
+                                    .collection('Doctors')
+                                    .doc(Doctor.uid)
+                                    .update({
+                                  'patients': FieldValue.arrayUnion(
+                                      [data['patientId']]),
+                                });
+                                FirebaseFirestore.instance
+                                    .collection('Patients')
+                                    .doc(data['patientId'])
+                                    .update({
+                                  'doctors': FieldValue.arrayUnion([Doctor.uid])
+                                });
+                                FirebaseFirestore.instance
+                                    .collection('Notifications')
+                                    .doc(uuid1)
+                                    .set({
+                                  'read': false,
+                                  'patient': data['patientId'],
+                                  'doctor': data['doctorId'],
+                                  'doctorImage': data['doctorImageUrl'],
+                                  'title': "Confirmation",
+                                  'content':
+                                      "Votre demande pour rendez-vous avec Dr ${data['doctorFirstName']} ${data['doctorLastName']} le ${data['date']} à ${data['time']} est confirmée",
+                                  'dateTime': dateTime,
+                                  'appointmentId': data['id'],
+                                  'id': uuid1
+                                });
 
-                                    FirebaseFirestore.instance
-                                        .collection('Bills')
-                                        .doc(uuid3)
-                                        .set({
-                                      'id': uuid3,
-                                      'consultId': data['id'],
-                                      'fee': 0,
-                                    });
+                                FirebaseFirestore.instance
+                                    .collection('Bills')
+                                    .doc(uuid3)
+                                    .set({
+                                  'id': uuid3,
+                                  'consultId': data['id'],
+                                  'fee': 0,
+                                });
 
-                                    FirebaseFirestore.instance
-                                        .collection('Prescreptions')
-                                        .doc(uuid4)
-                                        .set({
-                                      'id': uuid4,
-                                      'consultId': data['id'],
-                                      'meds': [],
-                                    });
-                                  },
-                                  icon: const Icon(
-                                    Icons.check,
-                                    size: 15,
-                                  ),
-                                  color: Colors.white,
-                                ),
+                                FirebaseFirestore.instance
+                                    .collection('Prescriptions')
+                                    .doc(uuid4)
+                                    .set({
+                                  'id': uuid4,
+                                  'consultId': data['id'],
+                                  'prescription': "",
+                                });
+
+                                final exists = await checkObservationExists(
+                                    data['patientId'], data['doctorId']);
+                                if (!exists) {
+                                  await createObservation(
+                                      data['patientId'], data['doctorId']);
+                                }
+                                setState(() {
+                                  DNotifPage.notifNumber;
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.check,
+                                size: 15,
                               ),
-                              CircleAvatar(
-                                radius: 15,
-                                backgroundColor: Colors.red,
-                                child: IconButton(
-                                  onPressed: () {
-                                    FirebaseFirestore.instance
-                                        .collection("Appointments")
-                                        .doc(data['id'])
-                                        .delete();
-                                    final uuid2 = const Uuid().v4();
-                                    FirebaseFirestore.instance
-                                        .collection('Notifications')
-                                        .doc(uuid2)
-                                        .set({
-                                      'read': false,
-                                      'patient': data['patientId'],
-                                      'doctor': data['doctorId'],
-                                      'doctorImage': data['doctorImageUrl'],
-                                      'title': "Refus",
-                                      'content':
-                                          "Votre demande pour rendez-vous avec Dr ${data['doctorFirstName']} ${data['doctorLastName']} le ${data['date']} à ${data['time']} est refusée",
-                                      'dateTime': dateTime,
-                                      'appointmentId': data['id'],
-                                      'id': uuid2
-                                    });
-                                  },
-                                  icon: const Icon(
-                                    IconlyBold.delete,
-                                    size: 15,
-                                  ),
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                      );
-                    }));
+                          CircleAvatar(
+                            radius: 15,
+                            backgroundColor: Colors.red,
+                            child: IconButton(
+                              onPressed: () {
+                                FirebaseFirestore.instance
+                                    .collection("Appointments")
+                                    .doc(data['id'])
+                                    .delete();
+                                final uuid2 = const Uuid().v4();
+                                FirebaseFirestore.instance
+                                    .collection('Notifications')
+                                    .doc(uuid2)
+                                    .set({
+                                  'read': false,
+                                  'patient': data['patientId'],
+                                  'doctor': data['doctorId'],
+                                  'doctorImage': data['doctorImageUrl'],
+                                  'title': "Refus",
+                                  'content':
+                                      "Votre demande pour rendez-vous avec Dr ${data['doctorFirstName']} ${data['doctorLastName']} le ${data['date']} à ${data['time']} est refusée",
+                                  'dateTime': dateTime,
+                                  'appointmentId': data['id'],
+                                  'id': uuid2
+                                });
+                                setState(() {
+                                  DNotifPage.notifNumber;
+                                });
+                              },
+                              icon: const Icon(
+                                IconlyBold.delete,
+                                size: 15,
+                              ),
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                });
           }
         },
       ),

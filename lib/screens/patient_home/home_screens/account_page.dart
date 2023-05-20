@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, library_prefixes
+// ignore_for_file: library_prefixes, use_build_context_synchronously, avoid_print
 
 import 'dart:async';
 import 'dart:io';
@@ -10,10 +10,12 @@ import 'package:finalapp/screens/Welcome/welcome_screen.dart';
 import 'package:finalapp/screens/patient_home/home_screens/app_feedback.dart';
 import 'package:finalapp/screens/patient_home/home_screens/change_pw.dart';
 import 'package:finalapp/services/firestoreServices.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as fStorage;
+import 'package:intl/intl.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -35,7 +37,11 @@ class _AccountPageState extends State<AccountPage> {
   bool lNtyping = false;
   bool etyping = false;
   bool ptyping = false;
+  bool hidePassword = true;
   bool dobtyping = false;
+  TextEditingController? myController = TextEditingController();
+  String errorAuth = "";
+  String formattedDate = "";
 
   @override
   void setState(VoidCallback fn) {
@@ -75,9 +81,123 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   bool isPhoneValid(String phone) {
-    String pattern = r'^(9|5|2)\d{7}$';
-    RegExp regExp = RegExp(pattern);
+    RegExp regExp = RegExp(r'^(9|5|2)\d{7}$');
     return regExp.hasMatch(phone);
+  }
+
+  bool isEmailValid(String email) {
+    RegExp regExp = RegExp(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$');
+    return regExp.hasMatch(email);
+  }
+
+  void updateEmail(String oldEmail, String newEmail, String password) async {
+    try {
+      showDialog(
+          context: (context),
+          builder: (BuildContext context) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: kPrimaryColor,
+              ),
+            );
+          });
+      throw FirebaseAuth.instance.currentUser!
+          .reauthenticateWithCredential(
+              EmailAuthProvider.credential(email: oldEmail, password: password))
+          .then((value) {
+        changeEmail(newEmail);
+        setState(() {
+          etyping = !etyping;
+          email!.clear();
+          myController!.clear();
+        });
+      });
+    } catch (errorAuth) {
+      print("this is the error!!!! ${errorAuth.toString()}");
+      Navigator.pop(context);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text(
+                "OOPS!",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+              ),
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              content: const Text('Mot de passe incorrect'),
+              actions: [
+                ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(kPrimaryColor),
+                      foregroundColor: MaterialStateProperty.all(Colors.white),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("OK"))
+              ],
+            );
+          });
+    }
+  }
+
+  void changeEmail(String email) async {
+    if (isEmailValid(email)) {
+      FirebaseAuth.instance.currentUser!.updateEmail(email);
+      FirebaseFirestore.instance
+          .collection('Patients')
+          .doc(Patient.uid)
+          .update({'userEmail': email});
+      FirestoreServices.getPatientById(Patient.uid);
+      Navigator.pop(context);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return const AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              content: Text("Votre email a était changé avec succés!"),
+            );
+          });
+      Timer(const Duration(seconds: 2), () {
+        Navigator.pop(context);
+      });
+    } else {
+      Navigator.pop(context);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text(
+                "OOPS!",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+              ),
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              content: const Text('Veuillez saisir un email valide'),
+              actions: [
+                ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(kPrimaryColor),
+                      foregroundColor: MaterialStateProperty.all(Colors.white),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("OK"))
+              ],
+            );
+          });
+    }
   }
 
   @override
@@ -165,12 +285,14 @@ class _AccountPageState extends State<AccountPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           "Supprimez votre photo",
                           style: TextStyle(fontSize: 15),
                         ),
-                        Icon(IconlyBold.delete)
+                        Container(
+                            margin: const EdgeInsets.only(right: 12),
+                            child: const Icon(IconlyBold.delete))
                       ],
                     ),
                   ),
@@ -237,7 +359,7 @@ class _AccountPageState extends State<AccountPage> {
                                             showAlert();
                                           } else {
                                             FirebaseFirestore.instance
-                                                .collection('Patient')
+                                                .collection('Patients')
                                                 .doc(Patient.uid)
                                                 .update({
                                               'lastName': lastName!.text
@@ -380,93 +502,119 @@ class _AccountPageState extends State<AccountPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Email:',
-                            style: TextStyle(fontSize: 17.5),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Container(
-                              child: etyping
-                                  ? Container(
-                                      margin: const EdgeInsets.only(bottom: 8),
-                                      height: 35,
-                                      width: 130,
-                                      child: TextField(
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: kPrimaryColor)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: kPrimaryColor)),
-                                        ),
-                                        cursorColor: Colors.black,
-                                        controller: email,
-                                        textCapitalization:
-                                            TextCapitalization.words,
-                                      ),
-                                    )
-                                  : Text(
-                                      Patient.email,
-                                      style: const TextStyle(
-                                          fontSize: 17.5,
-                                          fontWeight: FontWeight.w500),
-                                    )),
-                        ],
-                      ),
-                      Container(
-                          child: etyping
-                              ? Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    IconButton(
-                                        onPressed: () async {
-                                          if (email!.text.isEmpty) {
-                                            showAlert();
-                                          } else {
-                                            // change email of user auth!!!!
-                                            FirebaseFirestore.instance
-                                                .collection('Patients')
-                                                .doc(Patient.uid)
-                                                .update(
-                                                    {'userEmail': email!.text});
-                                            FirestoreServices.getPatientById(
-                                                Patient.uid);
-                                          }
-                                          setState(() {
-                                            Patient.email = email!.text;
-                                            etyping = !etyping;
-                                            email!.clear();
-                                          });
-                                        },
-                                        icon: const Icon(Icons.done)),
-                                    IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            etyping = !etyping;
-                                            email!.text = "";
-                                          });
-                                        },
-                                        icon: const Icon(Icons.close))
-                                  ],
-                                )
-                              : IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      etyping = !etyping;
-                                    });
-                                  },
-                                  icon: const Icon(IconlyLight.edit))),
-                    ],
-                  ),
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Email:',
+                              style: TextStyle(fontSize: 17.5),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              Patient.email,
+                              style: const TextStyle(
+                                  fontSize: 17.5, fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                etyping = !etyping;
+                              });
+                            },
+                            icon: etyping
+                                ? const Icon(Icons.close)
+                                : const Icon(IconlyLight.edit))
+                      ]),
                 ),
+                Container(
+                    child: etyping
+                        ? Column(
+                            children: [
+                              TextFieldContainer(
+                                child: TextFormField(
+                                  controller: email,
+                                  keyboardType: TextInputType.emailAddress,
+                                  decoration: const InputDecoration(
+                                      hintText: "Nouveau Email",
+                                      border: InputBorder.none,
+                                      icon: Icon(
+                                        IconlyLight.message,
+                                        color: kPrimaryColor,
+                                      )),
+                                ),
+                              ),
+                              TextFieldContainer(
+                                  child: TextFormField(
+                                obscureText: hidePassword,
+                                decoration: InputDecoration(
+                                  icon: const Icon(
+                                    IconlyLight.lock,
+                                    color: kPrimaryColor,
+                                  ),
+                                  suffixIcon: IconButton(
+                                      icon: Icon(
+                                        hidePassword
+                                            ? IconlyLight.hide
+                                            : IconlyLight.show,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          hidePassword = !hidePassword;
+                                        });
+                                      },
+                                      color: kPrimaryColor),
+                                  border: InputBorder.none,
+                                  hintText: "Mot de passe",
+                                ),
+                                controller: myController,
+                              )),
+                              Container(
+                                margin:
+                                    const EdgeInsetsDirectional.only(top: 5),
+                                width: 90,
+                                height: 50,
+                                child: TextButton(
+                                    onPressed: () {
+                                      if (email!.text.isEmpty ||
+                                          myController!.text.isEmpty) {
+                                        showAlert();
+                                      } else {
+                                        updateEmail(
+                                            Patient.email,
+                                            email!.text.trim().toLowerCase(),
+                                            myController!.text.trim());
+                                      }
+                                      print("errorrrrr: $errorAuth");
+                                    },
+                                    style: ButtonStyle(
+                                      elevation: MaterialStateProperty.all(10),
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
+                                              kPrimaryColor),
+                                      foregroundColor:
+                                          MaterialStateProperty.all(
+                                              Colors.white),
+                                      shape: MaterialStateProperty.all(
+                                        RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30)),
+                                      ),
+                                    ),
+                                    child: const Text("Valider",
+                                        style: TextStyle(fontSize: 17))),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              )
+                            ],
+                          )
+                        : const SizedBox.shrink()),
                 const Divider(
                   thickness: 0.5,
                   color: kPrimaryColor,
@@ -644,13 +792,21 @@ class _AccountPageState extends State<AccountPage> {
                                       height: 35,
                                       width: 130,
                                       child: TextField(
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(
+                                        textAlign: TextAlign.center,
+                                        readOnly: true,
+                                        decoration: InputDecoration(
+                                          contentPadding:
+                                              const EdgeInsets.only(top: 5),
+                                          hintText: formattedDate.isEmpty
+                                              ? "jj/mm/aaaa"
+                                              : formattedDate,
+                                          border: const OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: kPrimaryColor)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: kPrimaryColor)),
+                                          focusedBorder:
+                                              const OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: kPrimaryColor)),
                                         ),
                                         cursorColor: Colors.black,
                                         controller: dob,
@@ -671,7 +827,22 @@ class _AccountPageState extends State<AccountPage> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     IconButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          if (formattedDate == '') {
+                                            showAlert();
+                                          } else {
+                                            FirebaseFirestore.instance
+                                                .collection('Patients')
+                                                .doc(Patient.uid)
+                                                .update({
+                                              'birthDate': formattedDate
+                                            });
+                                            setState(() {
+                                              dobtyping = !dobtyping;
+                                              Patient.dob = formattedDate;
+                                            });
+                                          }
+                                        },
                                         icon: const Icon(Icons.done)),
                                     IconButton(
                                         onPressed: () {
@@ -684,7 +855,29 @@ class _AccountPageState extends State<AccountPage> {
                                   ],
                                 )
                               : IconButton(
-                                  onPressed: () {
+                                  onPressed: () async {
+                                    DateTime? pickedDate = await showDatePicker(
+                                        context: context,
+                                        initialDate:
+                                            DateTime.now(), //get today's date
+                                        firstDate: DateTime(
+                                            1900), //DateTime.now() - not to allow to choose before today.
+                                        lastDate: DateTime.now());
+                                    if (pickedDate != null) {
+                                      print(
+                                          pickedDate); //get the picked date in the format => 2022-07-04 00:00:00.000
+                                      formattedDate = DateFormat('dd/MM/yyyy')
+                                          .format(
+                                              pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+                                      print(
+                                          formattedDate); //formatted date output using intl package =>  2022-07-04
+                                      //You can format date as per your need
+
+                                      dob!.text =
+                                          formattedDate; //set formatted date to TextField value.
+                                    } else {
+                                      print("Date is not selected");
+                                    }
                                     setState(() {
                                       dobtyping = !dobtyping;
                                     });
@@ -700,6 +893,7 @@ class _AccountPageState extends State<AccountPage> {
                   endIndent: 20,
                   height: 15,
                 ),
+                const SizedBox(height: 10),
                 SizedBox(
                   width: 200,
                   height: 45,
@@ -711,6 +905,7 @@ class _AccountPageState extends State<AccountPage> {
                       }));
                     },
                     style: ButtonStyle(
+                      elevation: MaterialStateProperty.all(5),
                       backgroundColor: MaterialStateProperty.all(kPrimaryColor),
                       foregroundColor: MaterialStateProperty.all(Colors.white),
                       shape: MaterialStateProperty.all(
@@ -738,6 +933,7 @@ class _AccountPageState extends State<AccountPage> {
                       }));
                     },
                     style: ButtonStyle(
+                      elevation: MaterialStateProperty.all(5),
                       backgroundColor: MaterialStateProperty.all(kPrimaryColor),
                       foregroundColor: MaterialStateProperty.all(Colors.white),
                       shape: MaterialStateProperty.all(
@@ -766,6 +962,7 @@ class _AccountPageState extends State<AccountPage> {
                       }));
                     },
                     style: ButtonStyle(
+                      elevation: MaterialStateProperty.all(5),
                       backgroundColor: MaterialStateProperty.all(kPrimaryColor),
                       foregroundColor: MaterialStateProperty.all(Colors.white),
                       shape: MaterialStateProperty.all(
@@ -781,6 +978,9 @@ class _AccountPageState extends State<AccountPage> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  height: 10,
+                )
               ])),
         ),
       ),
@@ -902,7 +1102,7 @@ class _AccountPageState extends State<AccountPage> {
         .collection("Patients")
         .doc(Patient.uid)
         .update({"imageUrl": imageUrl});
-    FirestoreServices.getDoctorById(Patient.uid);
+    FirestoreServices.getPatientById(Patient.uid);
     checkUrl(imageUrl);
   }
 
@@ -1062,5 +1262,26 @@ class _AccountPageState extends State<AccountPage> {
         Navigator.pop(context);
       });
     }
+  }
+}
+
+class TextFieldContainer extends StatelessWidget {
+  final Widget child;
+  const TextFieldContainer({
+    super.key,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      width: size.width * 0.75,
+      decoration: BoxDecoration(
+          color: kPrimaryLightColor, borderRadius: BorderRadius.circular(30)),
+      child: child,
+    );
   }
 }

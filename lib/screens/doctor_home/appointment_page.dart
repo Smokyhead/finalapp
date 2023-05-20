@@ -3,13 +3,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/appoint_model.dart';
-import 'package:finalapp/models/description_model.dart';
-import 'package:finalapp/models/users.dart';
 import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:uuid/uuid.dart';
 
 class AppointPage extends StatefulWidget {
   const AppointPage({super.key});
@@ -19,24 +16,16 @@ class AppointPage extends StatefulWidget {
 }
 
 class _AppointPageState extends State<AppointPage> {
-  TextEditingController myController = TextEditingController();
-  bool typing = false;
-  String uuid = "";
-
-  Future updateDescription() async {
-    FirebaseFirestore.instance
-        .collection("PatientsDescriptions")
-        .doc(Description.id)
-        .update({"description": myController.text});
-    FirestoreServices.getDescriptionById(uuid);
-    setState(() {
-      myController.text = Description.description;
-    });
-  }
+  bool pTyping = false;
+  TextEditingController bill = TextEditingController();
+  TextEditingController pres = TextEditingController();
+  bool fTyping = false;
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    FirestoreServices.getPres(Appointment.prescriptionId);
+    FirestoreServices.getBill(Appointment.billId);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
@@ -201,64 +190,245 @@ class _AppointPageState extends State<AppointPage> {
               height: 0.5,
               color: Colors.black,
             ),
-            const SizedBox(
-              height: 25,
+
+            // ****************************
+            // partie facture
+
+            Padding(
+                padding: const EdgeInsets.only(
+                    right: 35, top: 10, bottom: 10, left: 35),
+                child: fTyping == false
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                              Bill.fee == 0
+                                  ? "Ajouter facture"
+                                  : "Modifer la facture",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 17,
+                                  color: kPrimaryColor)),
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (Bill.fee != 0) {
+                                    bill.text = Bill.fee.toString();
+                                  }
+                                  fTyping = !fTyping;
+                                });
+                              },
+                              icon: const Icon(IconlyLight.edit)),
+                        ],
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                if (bill.text.isEmpty) {
+                                  showAlert();
+                                } else {
+                                  FirebaseFirestore.instance
+                                      .collection('Bills')
+                                      .doc(Appointment.billId)
+                                      .update({'fee': int.parse(bill.text)});
+                                  setState(() {
+                                    Bill.fee;
+                                    fTyping = !fTyping;
+                                  });
+                                }
+                              },
+                              icon: const Icon(Icons.done)),
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  fTyping = !fTyping;
+                                });
+                              },
+                              icon: const Icon(Icons.close))
+                        ],
+                      )),
+            Padding(
+              padding: const EdgeInsets.only(left: 40, bottom: 20),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.money_rounded,
+                    size: 25,
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  const Text(
+                    "Facture",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 65, right: 10),
+                    width: 80,
+                    height: 40,
+                    child: fTyping == false
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 5, left: 50),
+                            child: Text(
+                              Bill.fee.toString(),
+                              style: const TextStyle(
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color.fromARGB(255, 153, 12, 12)),
+                            ),
+                          )
+                        : TextField(
+                            style: const TextStyle(fontSize: 23),
+                            decoration: const InputDecoration(
+                              hintText: "00",
+                              contentPadding: EdgeInsets.only(top: 5, left: 10),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(color: kPrimaryColor)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: kPrimaryColor)),
+                            ),
+                            cursorColor: Colors.black,
+                            controller: bill,
+                            keyboardType: TextInputType.number,
+                          ),
+                  ),
+                  const Text("TND", style: TextStyle(fontSize: 20))
+                ],
+              ),
             ),
-            SizedBox(
-              height: 60,
-              width: 260,
-              child: TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ButtonStyle(
-                    side: MaterialStateProperty.all(const BorderSide(
-                        style: BorderStyle.solid, color: kPrimaryColor)),
-                    elevation: MaterialStateProperty.all(6),
-                    backgroundColor:
-                        MaterialStateProperty.all(kPrimaryLightColor),
-                    foregroundColor: MaterialStateProperty.all(kPrimaryColor),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
+            Container(
+              width: size.width - 100,
+              height: 0.5,
+              color: Colors.black,
+            ),
+
+            // ****************************
+            // partie ordonnance
+
+            Padding(
+                padding: const EdgeInsets.only(
+                    right: 35, top: 10, bottom: 10, left: 35),
+                child: pTyping == false
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                              Prescription.prescription == ''
+                                  ? "Ajouter ordonnance"
+                                  : "Modifer l'ordonnance",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 17,
+                                  color: kPrimaryColor)),
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (Prescription.prescription != '') {
+                                    pres.text = Prescription.prescription;
+                                  }
+                                  pTyping = !pTyping;
+                                });
+                              },
+                              icon: const Icon(IconlyLight.edit)),
+                        ],
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                if (pres.text.isEmpty) {
+                                  showAlert();
+                                } else {
+                                  FirebaseFirestore.instance
+                                      .collection('Prescriptions')
+                                      .doc(Appointment.prescriptionId)
+                                      .update({'prescription': pres.text});
+                                  setState(() {
+                                    FirestoreServices.getPres(
+                                        Appointment.prescriptionId);
+                                    Prescription.prescription = pres.text;
+                                    pTyping = !pTyping;
+                                  });
+                                }
+                              },
+                              icon: const Icon(Icons.done)),
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  pTyping = !pTyping;
+                                });
+                              },
+                              icon: const Icon(Icons.close))
+                        ],
+                      )),
+            Prescription.prescription == "" && pTyping == false
+                ? const Center(
+                    child: Text(
+                      "Aucune ordonnance à afficher",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : TextFieldContainer(
+                    child: TextField(
+                      style: const TextStyle(fontSize: 20),
+                      textCapitalization: TextCapitalization.sentences,
+                      controller: pres,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 10,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: Prescription.prescription == ""
+                            ? "Tapez le contenu de l'ordonnance ICI"
+                            : Prescription.prescription,
+                      ),
+                      readOnly: pTyping == false ? true : false,
                     ),
                   ),
-                  child: const Text(
-                    "Ajouter Facture",
-                    style: TextStyle(fontSize: 20),
-                  )),
-            ),
             const SizedBox(
               height: 25,
-            ),
-            SizedBox(
-              height: 60,
-              width: 260,
-              child: TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ButtonStyle(
-                    side: MaterialStateProperty.all(const BorderSide(
-                        style: BorderStyle.solid, color: kPrimaryColor)),
-                    elevation: MaterialStateProperty.all(6),
-                    backgroundColor:
-                        MaterialStateProperty.all(kPrimaryLightColor),
-                    foregroundColor: MaterialStateProperty.all(kPrimaryColor),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                    ),
-                  ),
-                  child: const Text(
-                    "Ajouter Ordonnance",
-                    style: TextStyle(fontSize: 20),
-                  )),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void showAlert() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+              "OOPS!",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+            ),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            content: const Text("Veillez remplir le champs vide."),
+            actions: [
+              ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(kPrimaryColor),
+                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("OK"))
+            ],
+          );
+        });
   }
 }
 
@@ -279,7 +449,9 @@ class TextFieldContainer extends StatelessWidget {
       width: size.width * 0.8,
       height: 150,
       decoration: BoxDecoration(
-          color: kPrimaryLightColor, borderRadius: BorderRadius.circular(5)),
+          color: kPrimaryLightColor,
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: kPrimaryColor)),
       child: child,
     );
   }

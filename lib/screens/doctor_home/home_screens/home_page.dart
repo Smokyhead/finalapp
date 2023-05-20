@@ -9,9 +9,12 @@ import 'package:finalapp/screens/doctor_home/home_screens/consultations_list_doc
 import 'package:finalapp/screens/doctor_home/home_screens/manage_services.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/patient_profile.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/patients_list.dart';
+import 'package:finalapp/screens/doctor_home/home_screens/today_appointments.dart';
 import 'package:finalapp/screens/patient_home/widgets/consultation_card.dart';
 import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,13 +35,14 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: kPrimaryColor,
         ),
       ),
-      body: const Body(),
+      body: Body(),
     );
   }
 }
 
 class Body extends StatelessWidget {
-  const Body({super.key});
+  Body({super.key});
+  final String today = DateFormat('dd-MM-yyyy').format(DateTime.now());
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +60,13 @@ class Body extends StatelessWidget {
                     width: size.width,
                     height: size.height * 0.2 - 40,
                     decoration: const BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color.fromARGB(255, 41, 41, 41),
+                            spreadRadius: 0.005,
+                            blurRadius: 5,
+                          )
+                        ],
                         color: kPrimaryColor,
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(35),
@@ -78,7 +89,7 @@ class Body extends StatelessWidget {
                                       fontSize: 20, color: kPrimaryLightColor),
                                 ),
                                 Text(
-                                  "${Doctor.firstName} ${Doctor.lastName}",
+                                  "Dr ${Doctor.firstName} ${Doctor.lastName}",
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 27.5,
@@ -127,7 +138,7 @@ class Body extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        "Consultations à venir",
+                        "Consultations d'aujourd'hui",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
@@ -135,12 +146,13 @@ class Body extends StatelessWidget {
                           onPressed: () {
                             Navigator.push(context, MaterialPageRoute(
                                 builder: (BuildContext context) {
-                              return const DConsultationsList();
+                              return const DTodayConsultationsList();
                             }));
                           },
                           icon: const Icon(
-                            Icons.arrow_right_alt,
+                            IconlyBold.arrow_right_circle,
                             size: 33,
+                            color: Color.fromARGB(255, 11, 45, 61),
                           )),
                     ],
                   ),
@@ -153,6 +165,7 @@ class Body extends StatelessWidget {
                         .where('isApproved', isEqualTo: true)
                         .where('status', isEqualTo: 'upcoming')
                         .where('doctorId', isEqualTo: Doctor.uid)
+                        .where('date', isEqualTo: today)
                         .orderBy('dateTime', descending: false)
                         .snapshots(),
                     builder: (context, snapshots) {
@@ -226,6 +239,31 @@ class Body extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
+                        "Consulter vos rendez-vous",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(
+                                builder: (BuildContext context) {
+                              return const DConsultationsList();
+                            }));
+                          },
+                          icon: const Icon(
+                            IconlyBold.arrow_right_circle,
+                            size: 33,
+                            color: Color.fromARGB(255, 11, 45, 61),
+                          )),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
                         "Mes Services",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
@@ -238,8 +276,9 @@ class Body extends StatelessWidget {
                             }));
                           },
                           icon: const Icon(
-                            Icons.arrow_right_alt,
+                            IconlyBold.arrow_right_circle,
                             size: 33,
+                            color: Color.fromARGB(255, 11, 45, 61),
                           )),
                     ],
                   ),
@@ -275,8 +314,9 @@ class Body extends StatelessWidget {
                             }));
                           },
                           icon: const Icon(
-                            Icons.arrow_right_alt,
+                            IconlyBold.arrow_right_circle,
                             size: 33,
+                            color: Color.fromARGB(255, 11, 45, 61),
                           )),
                     ],
                   ),

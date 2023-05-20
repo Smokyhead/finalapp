@@ -1,4 +1,11 @@
+// ignore_for_file: avoid_print
+
+import 'dart:async';
+
 import 'package:finalapp/constants.dart';
+import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/auth/Login/Components/reset_password_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChangePW extends StatefulWidget {
@@ -19,167 +26,361 @@ class _ChangePW extends State<ChangePW> {
   String newpw = "";
   String newpwcon = "";
 
+  final currentUser = FirebaseAuth.instance.currentUser;
+  final auth = FirebaseAuth.instance;
+
+  bool _isValidPassword(String password) {
+    String pattern =
+        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#$%^&*(),.?":{}|<>]).{8,}$';
+    RegExp regExp = RegExp(pattern);
+    return regExp.hasMatch(password);
+  }
+
+  changePassword(
+      String email, String oldpw, String newpw, String newpwConf) async {
+    final cred =
+        EmailAuthProvider.credential(email: Patient.email, password: oldpw);
+
+    await currentUser!.reauthenticateWithCredential(cred).then((value) {
+      currentUser!.updatePassword(newpw);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return const AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              content: Text("Votre mot de passe a était changé avec succés!"),
+            );
+          });
+      setState(() {
+        oldpwController.clear();
+        newpwController.clear();
+        newpwconController.clear();
+      });
+      Timer(const Duration(seconds: 2), () {
+        Navigator.pop(context);
+        Navigator.pop(context);
+      });
+    }).catchError((e) {
+      print(e.toString());
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text(
+                "OOPS!",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+              ),
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              content: const Text("Mot de passe incorrect"),
+              actions: [
+                ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(kPrimaryColor),
+                      foregroundColor: MaterialStateProperty.all(Colors.white),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("OK"))
+              ],
+            );
+          });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-      return Scaffold(
-          body: SafeArea(
-              child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.only(top: 100),
-                  child: const Text(
-                    'Réinitialisez votre mot de passe',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 25,
-                      color: kPrimaryColor,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 100),
-                TextFieldContainer(
-                    child: TextFormField(
-                  controller: oldpwController,
-                  obscureText: hidePassword1,
-                  decoration: InputDecoration(
-                    icon: const Icon(
-                      Icons.lock,
-                      color: kPrimaryColor,
-                    ),
-                    suffixIcon: IconButton(
-                        icon: Icon(
-                          hidePassword1
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            hidePassword1 = !hidePassword1;
-                          });
-                        },
-                        color: kPrimaryColor),
-                    border: InputBorder.none,
-                    hintText: "Votre Mot de passe",
-                  ),
-                )),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextFieldContainer(
-                    child: TextFormField(
-                  controller: newpwController,
-                  obscureText: hidePassword2,
-                  decoration: InputDecoration(
-                    icon: const Icon(
-                      Icons.key,
-                      color: kPrimaryColor,
-                    ),
-                    suffixIcon: IconButton(
-                        icon: Icon(
-                          hidePassword2
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            hidePassword2 = !hidePassword2;
-                          });
-                        },
-                        color: kPrimaryColor),
-                    border: InputBorder.none,
-                    hintText: "Nouveau mot de passe",
-                  ),
-                )),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextFieldContainer(
-                    child: TextFormField(
-                  controller: newpwconController,
-                  obscureText: hidePassword3,
-                  decoration: InputDecoration(
-                    icon: const Icon(
-                      Icons.check,
-                      color: kPrimaryColor,
-                    ),
-                    suffixIcon: IconButton(
-                        icon: Icon(
-                          hidePassword3
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            hidePassword3 = !hidePassword3;
-                          });
-                        },
-                        color: kPrimaryColor),
-                    border: InputBorder.none,
-                    hintText: "Confirmer nouveau mot de passe",
-                  ),
-                )),
-                const SizedBox(
-                  height: 100,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    SizedBox(
-                      height: 55,
-                      width: 100,
-                      child: TextButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(kPrimaryColor),
-                          foregroundColor:
-                              MaterialStateProperty.all(Colors.white),
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30)),
-                          ),
-                        ),
-                        child: const Text(
-                          'Valider',
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                        ),
-                        onPressed: () {
-                          
-                        },
-                      ),
-                    ),
-                    SizedBox(
-                      height: 55,
-                      width: 100,
-                      child: TextButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(kPrimaryColor),
-                          foregroundColor:
-                              MaterialStateProperty.all(Colors.white),
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30)),
-                          ),
-                        ),
-                        child: const Text(
-                          'Fermer',
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+    return Scaffold(
+        body: SafeArea(
+            child: SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            margin: const EdgeInsets.only(top: 120),
+            child: const Text(
+              'Réinitialisez votre mot de passe',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 25,
+                color: kPrimaryColor,
+              ),
             ),
-          )));
-    
+          ),
+          const SizedBox(height: 100),
+          TextFieldContainer(
+              child: TextFormField(
+            controller: oldpwController,
+            obscureText: hidePassword1,
+            decoration: InputDecoration(
+              icon: const Icon(
+                Icons.lock,
+                color: kPrimaryColor,
+              ),
+              suffixIcon: IconButton(
+                  icon: Icon(
+                    hidePassword1 ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      hidePassword1 = !hidePassword1;
+                    });
+                  },
+                  color: kPrimaryColor),
+              border: InputBorder.none,
+              hintText: "Votre Mot de passe",
+            ),
+          )),
+          const SizedBox(
+            height: 10,
+          ),
+          TextFieldContainer(
+              child: TextFormField(
+            controller: newpwController,
+            obscureText: hidePassword2,
+            decoration: InputDecoration(
+              icon: const Icon(
+                Icons.key,
+                color: kPrimaryColor,
+              ),
+              suffixIcon: IconButton(
+                  icon: Icon(
+                    hidePassword2 ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      hidePassword2 = !hidePassword2;
+                    });
+                  },
+                  color: kPrimaryColor),
+              border: InputBorder.none,
+              hintText: "Nouveau mot de passe",
+            ),
+          )),
+          const SizedBox(
+            height: 10,
+          ),
+          TextFieldContainer(
+              child: TextFormField(
+            controller: newpwconController,
+            obscureText: hidePassword3,
+            decoration: InputDecoration(
+              icon: const Icon(
+                Icons.check,
+                color: kPrimaryColor,
+              ),
+              suffixIcon: IconButton(
+                  icon: Icon(
+                    hidePassword3 ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      hidePassword3 = !hidePassword3;
+                    });
+                  },
+                  color: kPrimaryColor),
+              border: InputBorder.none,
+              hintText: "Confirmer nouveau mot de passe",
+            ),
+          )),
+          const SizedBox(
+            height: 20,
+          ),
+          TextButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const ResetPassword();
+                }));
+              },
+              child: const Text(
+                'Récupérez Mot de passe',
+                style: TextStyle(color: Colors.blueGrey),
+              )),
+          const SizedBox(
+            height: 100,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              SizedBox(
+                height: 55,
+                width: 100,
+                child: TextButton(
+                  style: ButtonStyle(
+                    elevation: MaterialStateProperty.all(5),
+                    backgroundColor: MaterialStateProperty.all(kPrimaryColor),
+                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                    ),
+                  ),
+                  child: const Text(
+                    'Valider',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  onPressed: () {
+                    if (oldpwController.text.isEmpty ||
+                        newpwController.text.isEmpty ||
+                        newpwconController.text.isEmpty) {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text(
+                                "OOPS!",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 30),
+                              ),
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20))),
+                              content: const Text(
+                                  "Veillez remplir les champs vides"),
+                              actions: [
+                                ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
+                                              kPrimaryColor),
+                                      foregroundColor:
+                                          MaterialStateProperty.all(
+                                              Colors.white),
+                                      shape: MaterialStateProperty.all(
+                                        RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30)),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text("OK"))
+                              ],
+                            );
+                          });
+                    } else {
+                      if (_isValidPassword(newpwController.text) == true) {
+                        if (newpwController.text == newpwconController.text) {
+                          changePassword(Patient.email, oldpwController.text,
+                              newpwController.text, newpwconController.text);
+                        } else {
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                    "OOPS!",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 30),
+                                  ),
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20))),
+                                  content: const Text(
+                                      "Veillez confirmer votre mot de passe"),
+                                  actions: [
+                                    ElevatedButton(
+                                        style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                                  kPrimaryColor),
+                                          foregroundColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.white),
+                                          shape: MaterialStateProperty.all(
+                                            RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(30)),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text("OK"))
+                                  ],
+                                );
+                              });
+                        }
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text(
+                                  "OOPS!",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 30),
+                                ),
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20))),
+                                content: const Text(
+                                    "Le mot de passe doit contenir au minimum:\n8 caractères\nUne lettre majuscule\nUne lettre minuscule\nUn chiffre\nUn symbole"),
+                                actions: [
+                                  ElevatedButton(
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
+                                                kPrimaryColor),
+                                        foregroundColor:
+                                            MaterialStateProperty.all(
+                                                Colors.white),
+                                        shape: MaterialStateProperty.all(
+                                          RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30)),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text("OK"))
+                                ],
+                              );
+                            });
+                      }
+                    }
+                  },
+                ),
+              ),
+              SizedBox(
+                height: 55,
+                width: 100,
+                child: TextButton(
+                  style: ButtonStyle(
+                    elevation: MaterialStateProperty.all(5),
+                    backgroundColor: MaterialStateProperty.all(kPrimaryColor),
+                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                    ),
+                  ),
+                  child: const Text(
+                    'Fermer',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    )));
   }
 }
 

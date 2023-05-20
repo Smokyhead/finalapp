@@ -14,7 +14,7 @@ class Appointment {
   static String doctorImage = "";
   static String patientImage = "";
   static String billId = "";
-  static String prescreptionId = "";
+  static String prescriptionId = "";
 
   static void fromMap(Map<String, dynamic> data) {
     doctorId = data['doctorId'] ?? '';
@@ -27,11 +27,37 @@ class Appointment {
     time = data['time'] ?? '';
     status = data['status'] ?? '';
     doctorPhone = data['doctorPhone'] ?? '';
-    patientPhone = data['ipatientPhoned'] ?? '';
+    patientPhone = data['patientPhone'] ?? '';
     doctorImage = data['doctorImageUrl'] ?? '';
     patientImage = data['patientImageUrl'] ?? '';
     billId = data['billId'] ?? '';
-    prescreptionId = data['prescreptionId'] ?? '';
+    prescriptionId = data['prescriptionId'] ?? '';
     id = data['id'] ?? '';
+  }
+}
+
+class Bill {
+  static String id = "";
+  static String patientId = "";
+  static String doctorId = "";
+  static int fee = 0;
+
+  static void fromMap(Map<String, dynamic> data) {
+    id = data['id'] ?? '';
+    patientId = data['patientId'] ?? '';
+    doctorId = data['doctorId'] ?? '';
+    fee = data['fee'] ?? '';
+  }
+}
+
+class Prescription {
+  static String id = "";
+  static String consultId = "";
+  static String prescription = "";
+
+  static void fromMap(Map<String, dynamic> data) {
+    id = data['id'] ?? '';
+    consultId = data['consultId'] ?? '';
+    prescription = data['prescription'] ?? '';
   }
 }

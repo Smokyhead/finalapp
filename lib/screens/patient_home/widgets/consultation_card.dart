@@ -207,7 +207,7 @@ class ConsultationCard extends StatelessWidget {
                   radius: 17,
                   backgroundColor: Colors.green,
                   child: IconButton(
-                    onPressed: () async {
+                    onPressed: () {
                       if (role == 'doctor') {
                         final Uri url = Uri(scheme: 'tel', path: patientPhone);
                         launchUrl(url);

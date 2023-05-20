@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/patient_home/appointment_page_p.dart';
+import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ConsultationsList extends StatefulWidget {
   const ConsultationsList({super.key});
@@ -197,7 +202,9 @@ class _ConsultationsListState extends State<ConsultationsList> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20)),
                               child: ListTile(
-                                onTap: () {},
+                                onTap: () {
+                                  toAppointPage(data['id']);
+                                },
                                 contentPadding: const EdgeInsets.all(5),
                                 leading: CircleAvatar(
                                   radius: 30,
@@ -247,7 +254,89 @@ class _ConsultationsListState extends State<ConsultationsList> {
                                         radius: 15,
                                         backgroundColor: Colors.red,
                                         child: IconButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            showDialog(
+                                                context: context,
+                                                builder: (BuildContext build) {
+                                                  return AlertDialog(
+                                                    title: const Text(
+                                                      "Avertissement!",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 30,
+                                                          color: Colors.red),
+                                                    ),
+                                                    shape: const RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    20))),
+                                                    content: const Text(
+                                                        "vous êtes sur le point de supprimer une consultation!\nvoulez-vous vraiment la supprimer?"),
+                                                    actions: [
+                                                      ElevatedButton(
+                                                          style: ButtonStyle(
+                                                            backgroundColor:
+                                                                MaterialStateProperty
+                                                                    .all(
+                                                                        kPrimaryColor),
+                                                            foregroundColor:
+                                                                MaterialStateProperty
+                                                                    .all(Colors
+                                                                        .white),
+                                                            shape:
+                                                                MaterialStateProperty
+                                                                    .all(
+                                                              RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              30)),
+                                                            ),
+                                                          ),
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          child: const Text(
+                                                              "Annuler")),
+                                                      ElevatedButton(
+                                                          style: ButtonStyle(
+                                                            backgroundColor:
+                                                                MaterialStateProperty
+                                                                    .all(Colors
+                                                                        .red),
+                                                            foregroundColor:
+                                                                MaterialStateProperty
+                                                                    .all(Colors
+                                                                        .white),
+                                                            shape:
+                                                                MaterialStateProperty
+                                                                    .all(
+                                                              RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              30)),
+                                                            ),
+                                                          ),
+                                                          onPressed: () {
+                                                            FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    "Appointments")
+                                                                .doc(data['id'])
+                                                                .delete();
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          child: const Text(
+                                                              "Supprimer"))
+                                                    ],
+                                                  );
+                                                });
+                                          },
                                           icon: const Icon(
                                             IconlyBold.delete,
                                             size: 15,
@@ -259,7 +348,12 @@ class _ConsultationsListState extends State<ConsultationsList> {
                                         radius: 15,
                                         backgroundColor: Colors.green,
                                         child: IconButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            final Uri url = Uri(
+                                                scheme: 'tel',
+                                                path: data['doctorPhone']);
+                                            launchUrl(url);
+                                          },
                                           icon: const Icon(
                                             IconlyBold.call,
                                             size: 15,
@@ -329,7 +423,9 @@ class _ConsultationsListState extends State<ConsultationsList> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
                     child: ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        toAppointPage(data['id']);
+                      },
                       contentPadding: const EdgeInsets.all(5),
                       leading: CircleAvatar(
                         radius: 30,
@@ -374,7 +470,73 @@ class _ConsultationsListState extends State<ConsultationsList> {
                               radius: 15,
                               backgroundColor: Colors.red,
                               child: IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext build) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                            "Avertissement!",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 30,
+                                                color: Colors.red),
+                                          ),
+                                          shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20))),
+                                          content: const Text(
+                                              "vous êtes sur le point de supprimer une consultation!\nvoulez-vous vraiment la supprimer?"),
+                                          actions: [
+                                            ElevatedButton(
+                                                style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty.all(
+                                                          kPrimaryColor),
+                                                  foregroundColor:
+                                                      MaterialStateProperty.all(
+                                                          Colors.white),
+                                                  shape:
+                                                      MaterialStateProperty.all(
+                                                    RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(30)),
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text("Annuler")),
+                                            ElevatedButton(
+                                                style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty.all(
+                                                          Colors.red),
+                                                  foregroundColor:
+                                                      MaterialStateProperty.all(
+                                                          Colors.white),
+                                                  shape:
+                                                      MaterialStateProperty.all(
+                                                    RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(30)),
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  FirebaseFirestore.instance
+                                                      .collection(
+                                                          "Appointments")
+                                                      .doc(data['id'])
+                                                      .delete();
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text("Supprimer"))
+                                          ],
+                                        );
+                                      });
+                                },
                                 icon: const Icon(
                                   IconlyBold.delete,
                                   size: 15,
@@ -386,7 +548,11 @@ class _ConsultationsListState extends State<ConsultationsList> {
                               radius: 15,
                               backgroundColor: Colors.green,
                               child: IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  final Uri url = Uri(
+                                      scheme: 'tel', path: data['doctorPhone']);
+                                  launchUrl(url);
+                                },
                                 icon: const Icon(
                                   IconlyBold.call,
                                   size: 15,
@@ -461,7 +627,9 @@ class _ConsultationsListState extends State<ConsultationsList> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
                     child: ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        toAppointPage(data['id']);
+                      },
                       contentPadding: const EdgeInsets.all(5),
                       leading: CircleAvatar(
                         radius: 30,
@@ -506,7 +674,73 @@ class _ConsultationsListState extends State<ConsultationsList> {
                               radius: 15,
                               backgroundColor: Colors.red,
                               child: IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext build) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                            "Avertissement!",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 30,
+                                                color: Colors.red),
+                                          ),
+                                          shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20))),
+                                          content: const Text(
+                                              "vous êtes sur le point de supprimer une consultation!\nvoulez-vous vraiment la supprimer?"),
+                                          actions: [
+                                            ElevatedButton(
+                                                style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty.all(
+                                                          kPrimaryColor),
+                                                  foregroundColor:
+                                                      MaterialStateProperty.all(
+                                                          Colors.white),
+                                                  shape:
+                                                      MaterialStateProperty.all(
+                                                    RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(30)),
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text("Annuler")),
+                                            ElevatedButton(
+                                                style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty.all(
+                                                          Colors.red),
+                                                  foregroundColor:
+                                                      MaterialStateProperty.all(
+                                                          Colors.white),
+                                                  shape:
+                                                      MaterialStateProperty.all(
+                                                    RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(30)),
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  FirebaseFirestore.instance
+                                                      .collection(
+                                                          "Appointments")
+                                                      .doc(data['id'])
+                                                      .delete();
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text("Supprimer"))
+                                          ],
+                                        );
+                                      });
+                                },
                                 icon: const Icon(
                                   IconlyBold.delete,
                                   size: 15,
@@ -518,7 +752,11 @@ class _ConsultationsListState extends State<ConsultationsList> {
                               radius: 15,
                               backgroundColor: Colors.green,
                               child: IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  final Uri url = Uri(
+                                      scheme: 'tel', path: data['doctorPhone']);
+                                  launchUrl(url);
+                                },
                                 icon: const Icon(
                                   IconlyBold.call,
                                   size: 15,
@@ -538,5 +776,22 @@ class _ConsultationsListState extends State<ConsultationsList> {
         },
       );
     }
+  }
+
+  void toAppointPage(String id) {
+    FirestoreServices.getappointById(id);
+    showDialog(
+        context: (context),
+        builder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: kPrimaryColor,
+            ),
+          );
+        });
+    Timer(const Duration(seconds: 2), () {
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => const AppointPage()));
+    });
   }
 }

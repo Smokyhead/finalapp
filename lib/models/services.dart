@@ -2,7 +2,7 @@ class Services {
   static List<String> items = [
     "chirurgie viscérale",
     "chirurgie générale",
-    "chirurgie cardio- vasculaire et thoracique",
+    "chirurgie cardio-vasculaire et thoracique",
     "chirurgie vasculaire périphérique",
     "orthopédie",
     "traumatologie",

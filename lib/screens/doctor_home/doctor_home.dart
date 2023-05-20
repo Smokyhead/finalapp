@@ -23,6 +23,9 @@ class _DoctorHomeState extends State<DoctorHome> {
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      DNotifPage.notifNumber;
+    });
     return Scaffold(
       body: IndexedStack(
         index: currentPage,

@@ -1,5 +1,10 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
+import 'package:finalapp/models/users.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 class AppFeedback extends StatefulWidget {
   const AppFeedback({super.key});
@@ -9,99 +14,145 @@ class AppFeedback extends StatefulWidget {
 }
 
 class _AppFeedback extends State<AppFeedback> {
+  final controller = TextEditingController();
+  String uuid = "";
+  DateTime dateTime = DateTime.now();
+  @override
+  void initState() {
+    controller;
+    super.initState();
+  }
 
-    final myController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(
-            child: Padding(
-          padding: const EdgeInsets.only(left: 40, right: 40),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                const Text(
+        body: SingleChildScrollView(
+      child: SafeArea(
+          child: Padding(
+        padding: const EdgeInsets.only(left: 40, right: 40, top: 120),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.only(top: 1),
+                child: const Text(
                   'Aimez-vous l\'application?',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 27,
+                    fontSize: 25,
                     color: kPrimaryColor,
                   ),
                 ),
-                const SizedBox(
-                  height: 100,
-                ),
-                const SizedBox(
-                  width: 300,
-                  child: Text(
-                    'Donnez votre avis pour nous aider à ameliorer l\'application :',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
+              ),
+              const SizedBox(
+                height: 100,
+              ),
+              const SizedBox(
+                width: 300,
+                child: Text(
+                  'Donnez votre avis pour nous aider à ameliorer l\'application :',
+                  style: TextStyle(
+                    fontSize: 20,
                   ),
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
-                const TextFieldContainer(
-                  child: TextField(
-                    keyboardType: TextInputType.multiline,
-                    maxLines: 6,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Tapez votre réponse ici",
-                    ),
+              ),
+              const SizedBox(
+                height: 30,
+              ),
+              TextFieldContainer(
+                child: TextField(
+                  textCapitalization: TextCapitalization.sentences,
+                  controller: controller,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 6,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "Tapez votre réponse ici",
                   ),
                 ),
-                const SizedBox(
-                  height: 100,
-                ),
-                SizedBox(
-                    height: 55,
-                    width: 150,
-                    child: TextButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(kPrimaryColor),
-                          foregroundColor:
-                              MaterialStateProperty.all(Colors.white),
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15)),
-                          ),
+              ),
+              const SizedBox(
+                height: 100,
+              ),
+              SizedBox(
+                  height: 55,
+                  width: 150,
+                  child: TextButton(
+                      style: ButtonStyle(
+                        elevation: MaterialStateProperty.all(10),
+                        backgroundColor:
+                            MaterialStateProperty.all(kPrimaryColor),
+                        foregroundColor:
+                            MaterialStateProperty.all(Colors.white),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
                         ),
-                        child: const Text(
-                          'Valider',
-                          style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                      child: const Text(
+                        'Valider',
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                      onPressed: () {
+                        uuid = const Uuid().v4();
+                        FirebaseFirestore.instance
+                            .collection('AppFeedbacks')
+                            .doc(uuid)
+                            .set({
+                          'userId': Patient.uid,
+                          'userRole': 'patient',
+                          'feedback': controller.text.trim(),
+                          'dateTime': dateTime
+                        });
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext build) {
+                              return const AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20))),
+                                content: Text(
+                                  "Votre feedback a était envoyée avec succés",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: kPrimaryColor),
+                                ),
+                              );
+                            });
+                        Timer(const Duration(seconds: 2), () {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        });
+                      })),
+              const SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                  height: 55,
+                  width: 150,
+                  child: TextButton(
+                      style: ButtonStyle(
+                        elevation: MaterialStateProperty.all(10),
+                        backgroundColor:
+                            MaterialStateProperty.all(kPrimaryColor),
+                        foregroundColor:
+                            MaterialStateProperty.all(Colors.white),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
                         ),
-                        onPressed: () {})),
-                const SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                    height: 55,
-                    width: 150,
-                    child: TextButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(kPrimaryColor),
-                          foregroundColor:
-                              MaterialStateProperty.all(Colors.white),
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15)),
-                          ),
-                        ),
-                        child: const Text(
-                          'Retour',
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        }))
-              ]),
-        )));
+                      ),
+                      child: const Text(
+                        'Retour',
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      }))
+            ]),
+      )),
+    ));
   }
 }
 
@@ -122,7 +173,9 @@ class TextFieldContainer extends StatelessWidget {
       width: size.width * 0.8,
       height: 150,
       decoration: BoxDecoration(
-          color: kPrimaryLightColor, borderRadius: BorderRadius.circular(5)),
+          color: kPrimaryLightColor,
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: kPrimaryColor)),
       child: child,
     );
   }

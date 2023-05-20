@@ -1,15 +1,10 @@
 // ignore_for_file: avoid_print
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/appoint_model.dart';
-import 'package:finalapp/models/description_model.dart';
-import 'package:finalapp/models/users.dart';
-import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:uuid/uuid.dart';
 
 class AppointPage extends StatefulWidget {
   const AppointPage({super.key});
@@ -190,32 +185,83 @@ class _AppointPageState extends State<AppointPage> {
               height: 0.5,
               color: Colors.black,
             ),
+            Padding(
+              padding: const EdgeInsets.all(30),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: const [
+                      Icon(
+                        Icons.money_rounded,
+                        size: 25,
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Text("Facture:",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 23,
+                              color: kPrimaryColor)),
+                    ],
+                  ),
+                  Text(Bill.fee == 0 ? "- TND   " : "${Bill.fee} TND",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 22.5,
+                      ))
+                ],
+              ),
+            ),
+            Container(
+              width: size.width - 100,
+              height: 0.5,
+              color: Colors.black,
+            ),
             const SizedBox(
               height: 25,
             ),
-            SizedBox(
-              height: 60,
-              width: 260,
-              child: TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ButtonStyle(
-                    side: MaterialStateProperty.all(const BorderSide(
-                        style: BorderStyle.solid, color: kPrimaryColor)),
-                    elevation: MaterialStateProperty.all(6),
-                    backgroundColor:
-                        MaterialStateProperty.all(kPrimaryLightColor),
-                    foregroundColor: MaterialStateProperty.all(kPrimaryColor),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                    ),
+            Padding(
+              padding: const EdgeInsets.only(left: 35, right: 35, top: 5),
+              child: Row(
+                children: const [
+                  Icon(
+                    Icons.medical_services_outlined,
+                    size: 25,
                   ),
-                  child: const Text(
-                    "Retour",
-                    style: TextStyle(fontSize: 20),
-                  )),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Text("Ordonnance",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 23,
+                          color: kPrimaryColor)),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Prescription.prescription == ''
+                ? const Center(
+                    child: Text(
+                      "Aucune ordonnance à afficher",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : Text(
+                    Prescription.prescription,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w600, fontSize: 20),
+                  ),
+            const SizedBox(
+              height: 25,
             ),
           ],
         ),

@@ -42,46 +42,39 @@ class _BodyState extends State<Body> {
     super.initState();
     emailController.addListener(() {
       setState(() {
-        emailValid = _isValidEmail(emailController.text.trim());
+        emailValid = isEmailValid(emailController.text.trim());
       });
     });
   }
 
-  bool _isValidEmail(String email) {
-    final emailRegExp =
-        RegExp(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$');
-    if (!emailRegExp.hasMatch(email)) {
-      mes = "Email n'est pas valide";
-      return false;
-    }
-    return true;
-  }
-
-  bool _isPhoneValid(String phone) {
-    String pattern = r'^(9|5|2)\d{7}$';
-    RegExp regExp = RegExp(pattern);
+  bool isPhoneValid(String phone) {
+    RegExp regExp = RegExp(r'^(9|5|2)\d{7}$');
     return regExp.hasMatch(phone);
   }
 
-  bool _isValidPassword(String password) {
-    String pattern =
-        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#$%^&*(),.?":{}|<>]).{8,}$';
-    RegExp regExp = RegExp(pattern);
+  bool isEmailValid(String email) {
+    RegExp regExp = RegExp(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$');
+    return regExp.hasMatch(email);
+  }
+
+  bool isPasswordValid(String password) {
+    RegExp regExp = RegExp(
+        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#$%^&*(),.?":{}|<>]).{8,}$');
     return regExp.hasMatch(password);
   }
 
   Future<void> formValidation() async {
-    if (_isValidEmail(emailController.text) == true &&
-        _isPhoneValid(phoneController.text) == true) {
+    if (isEmailValid(emailController.text) == true &&
+        isPhoneValid(phoneController.text) == true) {
       if (pwController.text.trim() == pwConfController.text.trim()) {
         if (firstNameController.text.isNotEmpty &&
             lastNameController.text.isNotEmpty &&
-            _isValidEmail(emailController.text) == true &&
-            _isPhoneValid(phoneController.text) == true &&
+            isEmailValid(emailController.text) == true &&
+            isPhoneValid(phoneController.text) == true &&
             dateController.text.isNotEmpty &&
             pwController.text.isNotEmpty &&
             pwConfController.text.isNotEmpty) {
-          if (_isValidPassword(pwController.text.trim()) == true) {
+          if (isPasswordValid(pwController.text.trim()) == true) {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -237,7 +230,8 @@ class _BodyState extends State<Body> {
       final User currentUser = userCredential.user!;
       id = currentUser.uid;
       FirestoreServices.getPatientById(id);
-
+      UserState.isConnected = true;
+      Role.role = "patient";
       await saveDataToFirestore(currentUser);
       Navigator.pop(context);
 
@@ -245,10 +239,6 @@ class _BodyState extends State<Body> {
           MaterialPageRoute(builder: (BuildContext context) {
         return const PPicSelectScreen();
       }));
-
-      //send user to homePage
-      // Route newRoute = MaterialPageRoute(builder: (c) => const Scaffold());
-      // Navigator.pushReplacement(context, newRoute);
     } on FirebaseAuthException catch (e) {
       print(e);
       Navigator.pop(context);
@@ -487,10 +477,6 @@ class _BodyState extends State<Body> {
             child: TextButton(
               onPressed: () {
                 formValidation();
-                UserState.isConnected = true;
-                Role.role = "patient";
-                print("id: $id");
-                print(Patient.uid);
               },
               style: ButtonStyle(
                 elevation: MaterialStateProperty.all(10),
@@ -537,7 +523,6 @@ class TextFieldContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),

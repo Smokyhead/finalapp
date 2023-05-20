@@ -52,6 +52,8 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
             );
           });
       signIn();
+      UserState.isConnected = true;
+      Role.role = "doctor";
     } else {
       showDialog(
           context: context,
@@ -297,9 +299,6 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
                     passwordVal = myController2.text;
                     print("password = $passwordVal");
                     formValidation();
-                    Doctor.uid = id;
-                    Doctor.role = "doctor";
-                    Role.role = "doctor";
                   },
                   style: ButtonStyle(
                     elevation: MaterialStateProperty.all(10),
