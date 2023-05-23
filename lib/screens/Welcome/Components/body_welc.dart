@@ -1,5 +1,6 @@
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/screens/Welcome/Components/choice.dart';
+import 'package:finalapp/screens/admin/login.dart';
 import 'package:finalapp/screens/auth/Login/choice.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
@@ -10,11 +11,12 @@ class Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Background(
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <
           Widget>[
         Expanded(
-          flex: 1,
+          flex: 3,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: const [
@@ -30,6 +32,7 @@ class Body extends StatelessWidget {
           ),
         ),
         Expanded(
+          flex: 3,
           child: Column(
             children: [
               const Text(
@@ -105,6 +108,33 @@ class Body extends StatelessWidget {
                       ],
                     )),
               ),
+              Expanded(
+                flex: 1,
+                child: Container(
+                    margin: const EdgeInsets.all(20),
+                    padding: EdgeInsets.only(
+                        left: size.width / 3, top: size.height / 4.75),
+                    child: TextButton(
+                        style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all(kPrimaryColor)),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (BuildContext context) {
+                            return Connexion();
+                          }));
+                        },
+                        child: Row(
+                          children: const [
+                            Text(
+                              "Espace Administrateur",
+                              style: TextStyle(
+                                  decoration: TextDecoration.underline),
+                            ),
+                            Icon(IconlyBold.arrow_right)
+                          ],
+                        ))),
+              )
             ],
           ),
         ),

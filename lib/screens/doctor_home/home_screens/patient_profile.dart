@@ -184,7 +184,7 @@ class _PatientProfileState extends State<PatientProfile> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Description",
+                    "Observation",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   const SizedBox(
@@ -230,7 +230,7 @@ class _PatientProfileState extends State<PatientProfile> {
                         maxLines: 6,
                         decoration: const InputDecoration(
                           border: InputBorder.none,
-                          hintText: "Description",
+                          hintText: "Observation",
                         ),
                       ),
                     )
@@ -286,7 +286,7 @@ class _PatientProfileState extends State<PatientProfile> {
           child: Text(Observation.observation));
     } else {
       return const Text(
-        "Aucune description à afficher",
+        "Aucune observation à afficher",
         style: TextStyle(
             color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 18),
       );

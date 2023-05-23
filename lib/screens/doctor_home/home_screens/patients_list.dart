@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/doctor_home/home_screens/patient_profile.dart';
 import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
@@ -120,7 +121,7 @@ class _PatientsListState extends State<PatientsList> {
                           onTap: () {
                             final id = data['userUID'];
                             print(id);
-                            FirestoreServices.getDoctorById(id);
+                            FirestoreServices.getPatientById(id);
                             showDialog(
                                 context: (context),
                                 builder: (BuildContext context) {
@@ -134,7 +135,8 @@ class _PatientsListState extends State<PatientsList> {
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const Scaffold()));
+                                      builder: (context) =>
+                                          const PatientProfile()));
                             });
                           },
                           contentPadding: const EdgeInsets.all(10),

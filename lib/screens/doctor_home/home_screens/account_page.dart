@@ -235,7 +235,7 @@ class _AccountPageState extends State<AccountPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                 Container(
-                  margin: const EdgeInsets.only(top: 40),
+                  margin: const EdgeInsets.only(top: 15),
                   alignment: Alignment.center,
                   child: Stack(children: [
                     CircleAvatar(
@@ -270,7 +270,7 @@ class _AccountPageState extends State<AccountPage> {
                   ]),
                 ),
                 const SizedBox(
-                  height: 50,
+                  height: 25,
                 ),
                 TextButton(
                   style: ButtonStyle(
