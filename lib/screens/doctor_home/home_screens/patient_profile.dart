@@ -1,8 +1,10 @@
 // ignore_for_file: avoid_print
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/observation_model.dart';
 import 'package:finalapp/models/users.dart';
+import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,10 +19,10 @@ class PatientProfile extends StatefulWidget {
 class _PatientProfileState extends State<PatientProfile> {
   TextEditingController myController = TextEditingController();
   bool typing = false;
-  TextEditingController cont = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    FirestoreServices.getObsbyId(Observation.id);
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(
@@ -178,64 +180,97 @@ class _PatientProfileState extends State<PatientProfile> {
               height: 0.5,
               color: Colors.black,
             ),
+
+            // observation part ========================================
+
             Padding(
-              padding: const EdgeInsets.only(left: 35, right: 35, top: 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Observation",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Container(
-                      child: typing
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.done)),
-                                IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        typing = !typing;
-                                      });
-                                    },
-                                    icon: const Icon(Icons.close))
-                              ],
-                            )
-                          : IconButton(
+                padding: const EdgeInsets.only(
+                    right: 35, top: 15, bottom: 10, left: 35),
+                child: typing == false
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                              Observation.observation == ''
+                                  ? "Ajouter observation"
+                                  : "Modifer l'observation",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 17,
+                                  color: kPrimaryColor)),
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (Observation.observation != '') {
+                                    myController.text = Observation.observation;
+                                  }
+                                  typing = !typing;
+                                });
+                              },
+                              icon: const Icon(IconlyLight.edit)),
+                        ],
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                if (myController.text.isEmpty) {
+                                  showAlert();
+                                } else {
+                                  FirebaseFirestore.instance
+                                      .collection('Observations')
+                                      .doc(Observation.id)
+                                      .update(
+                                          {'observation': myController.text});
+                                  setState(() {
+                                    FirestoreServices.getObsbyId(
+                                        Observation.id);
+                                    Observation.observation = myController.text;
+                                    typing = !typing;
+                                  });
+                                }
+                              },
+                              icon: const Icon(Icons.done)),
+                          IconButton(
                               onPressed: () {
                                 setState(() {
                                   typing = !typing;
                                 });
                               },
-                              icon: const Icon(IconlyLight.edit))),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            Container(
-              child: typing
-                  ? TextFieldContainer(
-                      child: TextField(
-                        textCapitalization: TextCapitalization.sentences,
-                        controller: myController,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: 6,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          hintText: "Observation",
-                        ),
+                              icon: const Icon(Icons.close))
+                        ],
+                      )),
+            Observation.observation == "" && typing == false
+                ? const Center(
+                    child: Text(
+                      "Aucune ordonnance à afficher",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : TextFieldContainer(
+                    child: TextField(
+                      style: const TextStyle(fontSize: 20),
+                      textCapitalization: TextCapitalization.sentences,
+                      controller: myController,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 10,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: Observation.observation == ""
+                            ? "Observation"
+                            : Observation.observation,
                       ),
-                    )
-                  : checkIfNull(),
-            ),
+                      readOnly: typing == false ? true : false,
+                    ),
+                  ),
+
+            // =========================================================
+
             const SizedBox(
               height: 25,
             ),
@@ -269,28 +304,35 @@ class _PatientProfileState extends State<PatientProfile> {
     );
   }
 
-  checkIfNull() {
-    var size = MediaQuery.of(context).size;
-    if (Observation.id != "") {
-      return Container(
-          width: size.width * 0.8,
-          height: 100,
-          decoration: BoxDecoration(
-              boxShadow: const [
-                BoxShadow(color: Colors.grey, blurRadius: 10, spreadRadius: 10)
-              ],
-              color: kPrimaryLightColor,
-              borderRadius: BorderRadius.circular(5),
-              border:
-                  Border.all(color: const Color.fromARGB(255, 219, 223, 224))),
-          child: Text(Observation.observation));
-    } else {
-      return const Text(
-        "Aucune observation à afficher",
-        style: TextStyle(
-            color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 18),
-      );
-    }
+  void showAlert() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+              "OOPS!",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+            ),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            content: const Text("Veillez remplir le champs vide."),
+            actions: [
+              ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(kPrimaryColor),
+                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("OK"))
+            ],
+          );
+        });
   }
 }
 

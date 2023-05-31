@@ -119,9 +119,9 @@ class _PatientsListState extends State<PatientsList> {
                             borderRadius: BorderRadius.circular(20)),
                         child: ListTile(
                           onTap: () {
-                            final id = data['userUID'];
-                            print(id);
-                            FirestoreServices.getPatientById(id);
+                            FirestoreServices.getPatientById(data['userUID']);
+                            FirestoreServices.getObs(
+                                data['userUID'], Doctor.uid);
                             showDialog(
                                 context: (context),
                                 builder: (BuildContext context) {

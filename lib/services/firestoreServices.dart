@@ -125,7 +125,7 @@ class FirestoreServices {
     }
   }
 
-  static Future<void> getObservationById(String id) async {
+  static Future<void> getObsbyId(String id) async {
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('Observations')
@@ -133,39 +133,33 @@ class FirestoreServices {
           .get();
       if (snapshot.exists) {
         final data = snapshot.data() as Map<String, dynamic>;
-
-        print("this is the DATA: $data");
         Observation.fromMap(data);
-        print("DONE!!!");
       } else {
-        print('Not found');
+        print("does not exist");
       }
     } catch (e) {
-      print(e.toString());
+      print(e);
     }
   }
 
-  static Future<void> getObservation(String dId, String pId) async {
-    late final Map<String, dynamic> data;
+  static Future<void> getObs(String patient, String doctor) async {
     try {
       final snapshot = await FirebaseFirestore.instance
-          .collection('Descriptions')
-          .where('patientId', isEqualTo: pId)
-          .where('doctorId', isEqualTo: dId)
+          .collection('Observations')
+          .where('patientId', isEqualTo: patient)
+          .where('doctorId', isEqualTo: doctor)
+          .limit(1)
           .get();
-      if (snapshot.docs.isEmpty) {
-        print("empty");
+      final data = snapshot.docs[0].data();
+      if (data.isNotEmpty) {
+        print("exists");
+        print(data.toString());
+        Observation.fromMap(data);
       } else {
-        final list = snapshot.docs.map((doc) {
-          data = doc.data();
-          print(data.toString());
-        }).toList();
-        final data1 = list[0];
-        Observation.fromMap(data1);
+        print("does not exist");
       }
     } catch (e) {
-      print(e.toString());
-      print("something went wrong!!");
+      print(e);
     }
   }
 }

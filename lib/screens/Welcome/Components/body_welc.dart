@@ -111,9 +111,9 @@ class Body extends StatelessWidget {
               Expanded(
                 flex: 1,
                 child: Container(
-                    margin: const EdgeInsets.all(20),
+                    margin: const EdgeInsets.all(15),
                     padding: EdgeInsets.only(
-                        left: size.width / 3, top: size.height / 4.75),
+                        left: size.width / 3, top: size.height / 5),
                     child: TextButton(
                         style: ButtonStyle(
                             foregroundColor:
@@ -121,7 +121,7 @@ class Body extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (BuildContext context) {
-                            return Connexion();
+                            return const Connexion();
                           }));
                         },
                         child: Row(

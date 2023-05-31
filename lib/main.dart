@@ -1,4 +1,3 @@
-import 'package:finalapp/constants.dart';
 import 'package:finalapp/provider/dark_theme_prov.dart';
 import 'package:finalapp/screens/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -42,11 +41,10 @@ class _MyAppState extends State<MyApp> {
         }),
       ],
       child: Consumer<DarkProvider>(builder: (context, themeProvider, child) {
-        return MaterialApp(
+        return const MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Clin',
-          theme: Styles.themeData(themeProvider.getDarkTheme, context),
-          home: const SplashScreen(),
+          home: SplashScreen(),
         );
       }),
     );

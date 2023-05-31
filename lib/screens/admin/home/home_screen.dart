@@ -1,7 +1,14 @@
 import 'package:finalapp/constants.dart';
+import 'package:finalapp/screens/Welcome/welcome_screen.dart';
+import 'package:finalapp/screens/admin/home/consultations.dart';
+import 'package:finalapp/screens/admin/home/doctors_list_admin.dart';
+import 'package:finalapp/screens/admin/home/holidays.dart';
+import 'package:finalapp/screens/admin/home/patients_list_admin.dart';
+import 'package:finalapp/screens/admin/home/services.dart';
 import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
+import 'package:badges/badges.dart' as badges;
 
 class AdminHome extends StatefulWidget {
   const AdminHome({super.key});
@@ -12,8 +19,12 @@ class AdminHome extends StatefulWidget {
 
 class _AdminHomeState extends State<AdminHome> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
@@ -29,7 +40,23 @@ class _AdminHomeState extends State<AdminHome> {
             IconButton(
                 padding: const EdgeInsets.only(right: 15),
                 onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return const Scaffold();
+                  }));
+                },
+                icon: const badges.Badge(
+                    badgeContent: Text(
+                      "0",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    child: Icon(IconlyBold.notification))),
+            IconButton(
+                padding: const EdgeInsets.only(right: 15),
+                onPressed: () {
                   FirestoreServices.signOut();
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return const WelcomeScreen();
+                  }));
                 },
                 icon: const Icon(IconlyBold.logout))
           ],
@@ -39,36 +66,61 @@ class _AdminHomeState extends State<AdminHome> {
         children: [
           Expanded(
             child: Button(
-              onPressed: () {},
-              text: "Liste des docteurs",
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                  return const Doctors();
+                }));
+              },
+              text: "Docteurs",
               icon: const Icon(Icons.medical_information_outlined),
             ),
           ),
           Expanded(
             child: Button(
-              onPressed: () {},
-              text: "Liste des patients",
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                  return const Patients();
+                }));
+              },
+              text: "Patients",
               icon: const Icon(Icons.person),
             ),
           ),
           Expanded(
             child: Button(
-              onPressed: () {},
-              text: "Liste des consultations",
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                  return const Consultations();
+                }));
+              },
+              text: "Consultations",
               icon: const Icon(Icons.punch_clock_outlined),
             ),
           ),
           Expanded(
             child: Button(
-              onPressed: () {},
-              text: "Ajouter service",
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                  return const ManageServices();
+                }));
+              },
+              text: "Services",
               icon: const Icon(Icons.medical_services_outlined),
             ),
           ),
           Expanded(
             child: Button(
-              onPressed: () {},
-              text: "Ajouter jour férier",
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                  return const Holidays();
+                }));
+              },
+              text: "Jours fériés",
               icon: const Icon(Icons.access_time),
             ),
           )
@@ -80,13 +132,13 @@ class _AdminHomeState extends State<AdminHome> {
 
 class Button extends StatelessWidget {
   final Icon icon;
-  final Function onPressed;
   final String text;
+  final void Function() onPressed;
   const Button(
       {super.key,
-      required this.onPressed,
       required this.text,
-      required this.icon});
+      required this.icon,
+      required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +155,7 @@ class Button extends StatelessWidget {
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
         ),
-        onPressed: onPressed(),
+        onPressed: onPressed,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(

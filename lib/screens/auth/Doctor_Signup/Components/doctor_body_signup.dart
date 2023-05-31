@@ -2,7 +2,6 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
-import 'package:finalapp/models/services.dart';
 import 'package:finalapp/models/users.dart';
 import 'package:finalapp/screens/auth/Doctor_Login/doctor_login_screen.dart';
 import 'package:finalapp/screens/auth/Patient_Signup/Components/background_signup.dart';
@@ -21,26 +20,11 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  List<String> selectedItems = [];
-
-  void _showMultiSelect() async {
-    final List<String>? results = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return MultiSelect(items: Services.items);
-        });
-
-    if (results != null) {
-      setState(() {
-        selectedItems = results;
-      });
-    }
-  }
-
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
+  final serviceController = TextEditingController();
   final pwController = TextEditingController();
   final pwConfController = TextEditingController();
   bool hidePassword1 = true;
@@ -48,6 +32,7 @@ class _BodyState extends State<Body> {
   bool emailValid = true;
   late String mes;
   late String id = "";
+  bool isSelected = false;
 
   late SharedPreferences sharedPreferences;
 
@@ -78,7 +63,7 @@ class _BodyState extends State<Body> {
   }
 
   Future<void> formValidation() async {
-    if (selectedItems.isNotEmpty) {
+    if (serviceController.text == "") {
       if (isEmailValid(emailController.text) == true &&
           isPhoneValid(phoneController.text) == true) {
         if (pwController.text.trim() == pwConfController.text.trim()) {
@@ -361,7 +346,7 @@ class _BodyState extends State<Body> {
       "firstName": firstNameController.text.trim(),
       "lastName": lastNameController.text.trim(),
       "phone": phoneController.text,
-      "services": selectedItems,
+      "service": serviceController.text,
       "imageUrl": "",
       "patients": []
     });
@@ -377,14 +362,14 @@ class _BodyState extends State<Body> {
     await sharedPreferences.setString(
         "laststName", lastNameController.text.trim());
     await sharedPreferences.setString("phone", phoneController.text.toString());
-    await sharedPreferences.setStringList("services", selectedItems);
+    await sharedPreferences.setString("service", serviceController.text);
     await sharedPreferences.setString("imageUrl", "");
     await sharedPreferences.setStringList("patients", []);
   }
 
   @override
   Widget build(BuildContext context) {
-    // TextEditingController dateController = TextEditingController();
+    Size size = MediaQuery.of(context).size;
     return Background(
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -432,6 +417,92 @@ class _BodyState extends State<Body> {
             controller: phoneController,
           )),
           TextFieldContainer(
+              child: TextFormField(
+            readOnly: true,
+            decoration: const InputDecoration(
+                hintText: "Service", border: InputBorder.none),
+            controller: serviceController,
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      title: const Text(
+                        "Choisissez votre service",
+                        style: TextStyle(color: kPrimaryColor),
+                      ),
+                      content: SizedBox(
+                        height: size.height * 0.55,
+                        child: SingleChildScrollView(
+                          child: StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('Services')
+                                .orderBy('name')
+                                .snapshots(),
+                            builder: (context, snapshots) {
+                              if (snapshots.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    color: kPrimaryColor,
+                                  ),
+                                );
+                              }
+                              final docs = snapshots.data?.docs;
+                              if (docs == null || docs.isEmpty) {
+                                return const Center(
+                                  child: Text(
+                                    "Pas de service à afficher",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20,
+                                        color:
+                                            Color.fromARGB(255, 176, 127, 127)),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                );
+                              } else {
+                                return ListBody(
+                                  children: snapshots.data!.docs.map((item) {
+                                    var data =
+                                        item.data() as Map<String, dynamic>;
+                                    return Column(
+                                      children: [
+                                        ListTile(
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                              setState(() {
+                                                serviceController.text =
+                                                    data['name'];
+                                              });
+                                              print(serviceController.text);
+                                            },
+                                            title: Text(
+                                              data['name'],
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500),
+                                            )),
+                                        const Divider(
+                                          thickness: 1,
+                                          color: Colors.black38,
+                                        )
+                                      ],
+                                    );
+                                  }).toList(),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  });
+            },
+          )),
+          TextFieldContainer(
               child: TextField(
             obscureText: hidePassword1,
             decoration: InputDecoration(
@@ -472,37 +543,6 @@ class _BodyState extends State<Body> {
           const SizedBox(
             height: 25,
           ),
-          Container(
-            margin: const EdgeInsetsDirectional.only(top: 5),
-            width: 200,
-            height: 50,
-            child: TextButton(
-              onPressed: () {
-                _showMultiSelect();
-              },
-              style: ButtonStyle(
-                elevation: MaterialStateProperty.all(5),
-                backgroundColor: MaterialStateProperty.all(kPrimaryLightColor),
-                foregroundColor: MaterialStateProperty.all(kPrimaryColor),
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      side: const BorderSide(color: kPrimaryColor)),
-                ),
-              ),
-              child: const Text("Services", style: TextStyle(fontSize: 20)),
-            ),
-          ),
-          const SizedBox(
-            height: 25,
-          ),
-          Wrap(
-              spacing: 5,
-              children: selectedItems
-                  .map((e) => Chip(
-                        label: Text(e),
-                      ))
-                  .toList()),
           Container(
             margin: const EdgeInsetsDirectional.only(top: 5),
             width: 310,
@@ -569,8 +609,7 @@ class TextFieldContainer extends StatelessWidget {
 }
 
 class MultiSelect extends StatefulWidget {
-  final List<String> items;
-  const MultiSelect({super.key, required this.items});
+  const MultiSelect({super.key});
 
   @override
   State<MultiSelect> createState() => _MultiSelectState();
@@ -606,16 +645,7 @@ class _MultiSelectState extends State<MultiSelect> {
           "Choisissez vos services:",
           style: TextStyle(color: kPrimaryColor),
         ),
-        content: SingleChildScrollView(
-            child: ListBody(
-                children: widget.items
-                    .map((item) => CheckboxListTile(
-                        title: Text(item),
-                        controlAffinity: ListTileControlAffinity.leading,
-                        value: selectedItems.contains(item),
-                        onChanged: (isChecked) =>
-                            serviceChange(item, isChecked!)))
-                    .toList())),
+        content: SingleChildScrollView(child: ListBody()),
         actions: [
           TextButton(
             onPressed: submit,

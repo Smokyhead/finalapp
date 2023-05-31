@@ -9,7 +9,6 @@ import 'package:finalapp/models/users.dart';
 import 'package:finalapp/screens/Welcome/welcome_screen.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/app_feedback.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/change_pw.dart';
-import 'package:finalapp/screens/doctor_home/home_screens/manage_services.dart';
 import 'package:finalapp/services/firestoreServices.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -780,13 +779,7 @@ class _AccountPageState extends State<AccountPage> {
                         width: 10,
                       ),
                       IconButton(
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(
-                                builder: (BuildContext context) {
-                              return const ManageServices();
-                            }));
-                          },
-                          icon: const Icon(IconlyLight.edit))
+                          onPressed: () {}, icon: const Icon(IconlyLight.edit))
                     ],
                   ),
                 ),

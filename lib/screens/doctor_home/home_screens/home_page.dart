@@ -5,8 +5,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/doctor_home/home_screens/account_page.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/consultations_list_doctor.dart';
-import 'package:finalapp/screens/doctor_home/home_screens/manage_services.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/patient_profile.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/patients_list.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/today_appointments.dart';
@@ -272,7 +272,7 @@ class Body extends StatelessWidget {
                           onPressed: () {
                             Navigator.push(context, MaterialPageRoute(
                                 builder: (BuildContext context) {
-                              return const ManageServices();
+                              return const AccountPage();
                             }));
                           },
                           icon: const Icon(
@@ -367,6 +367,8 @@ class Body extends StatelessWidget {
                                   final id = data['userUID'];
                                   print(id);
                                   FirestoreServices.getPatientById(id);
+                                  FirestoreServices.getObs(
+                                      data['userUID'], Doctor.uid);
                                   showDialog(
                                       context: (context),
                                       builder: (BuildContext context) {
