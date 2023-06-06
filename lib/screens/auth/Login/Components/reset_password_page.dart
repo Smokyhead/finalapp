@@ -94,83 +94,101 @@ class _ResetPassword extends State<ResetPassword> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: AppBar(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(15),
+          )),
+          backgroundColor: kPrimaryColor,
+          foregroundColor: Colors.white,
+          title: const Text("Mot de passe"),
+        ),
+      ),
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          children: <Widget>[
-            Container(
-              margin: const EdgeInsets.only(
-                  top: 150, right: 20, left: 20, bottom: 150),
-              child: const Text(
-                "Récuperer votre mot de passe",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 26,
-                    color: kPrimaryColor),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(right: 5, left: 5, bottom: 10),
-              child: const Text(
-                "Veuillez saisir votre adresse email",
-                style: TextStyle(
-                  fontSize: 17,
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/images/Untitled design.jpg'),
+              fit: BoxFit.cover,
+              opacity: 0.5),
+        ),
+        child: SizedBox(
+          height: size.height,
+          width: double.infinity,
+          child: Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      margin: const EdgeInsets.only(
+                          right: 20, left: 20, bottom: 100),
+                      child: const Text(
+                        "Récuperer votre mot de passe",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 26,
+                            color: kPrimaryColor),
+                      ),
+                    ),
+                    Container(
+                      margin:
+                          const EdgeInsets.only(right: 5, left: 5, bottom: 25),
+                      child: const Text(
+                        "Veuillez saisir votre adresse email",
+                        style: TextStyle(
+                          fontSize: 17,
+                        ),
+                      ),
+                    ),
+                    TextFieldContainer(
+                      child: TextFormField(
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          hintText: "Email",
+                          border: InputBorder.none,
+                        ),
+                        controller: emailController,
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsetsDirectional.only(top: 50),
+                      width: 150,
+                      height: 50,
+                      child: TextButton(
+                        onPressed: () {
+                          _verifyEmail();
+                        },
+                        style: ButtonStyle(
+                          elevation: MaterialStateProperty.all(5),
+                          backgroundColor:
+                              MaterialStateProperty.all(kPrimaryColor),
+                          foregroundColor:
+                              MaterialStateProperty.all(Colors.white),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30)),
+                          ),
+                        ),
+                        child: const Text("Valider",
+                            style: TextStyle(fontSize: 19)),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 50,
+                    )
+                  ],
                 ),
               ),
-            ),
-            TextFieldContainer(
-              child: TextFormField(
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  hintText: "Email",
-                  border: InputBorder.none,
-                ),
-                controller: emailController,
-              ),
-            ),
-            Container(
-              margin: const EdgeInsetsDirectional.only(top: 20),
-              width: 150,
-              height: 50,
-              child: TextButton(
-                onPressed: () {
-                  _verifyEmail();
-                },
-                style: ButtonStyle(
-                  elevation: MaterialStateProperty.all(5),
-                  backgroundColor: MaterialStateProperty.all(kPrimaryColor),
-                  foregroundColor: MaterialStateProperty.all(Colors.white),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                  ),
-                ),
-                child: const Text("Valider", style: TextStyle(fontSize: 19)),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsetsDirectional.only(top: 20),
-              width: 150,
-              height: 50,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style: ButtonStyle(
-                  elevation: MaterialStateProperty.all(5),
-                  backgroundColor: MaterialStateProperty.all(kPrimaryColor),
-                  foregroundColor: MaterialStateProperty.all(Colors.white),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                  ),
-                ),
-                child: const Text("Fermer", style: TextStyle(fontSize: 19)),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

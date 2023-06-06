@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/models/appoint_model.dart';
+import 'package:finalapp/models/messaging.dart';
 import 'package:finalapp/models/observation_model.dart';
 import 'package:finalapp/models/users.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -155,6 +156,27 @@ class FirestoreServices {
         print("exists");
         print(data.toString());
         Observation.fromMap(data);
+      } else {
+        print("does not exist");
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<void> getConv(String patient, String doctor) async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('Conversations')
+          .where('patient', isEqualTo: patient)
+          .where('doctor', isEqualTo: doctor)
+          .limit(1)
+          .get();
+      final data = snapshot.docs[0].data();
+      if (data.isNotEmpty) {
+        print("exists");
+        print(data.toString());
+        Conversation.fromMap(data);
       } else {
         print("does not exist");
       }

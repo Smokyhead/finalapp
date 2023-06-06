@@ -9,6 +9,7 @@ import 'package:finalapp/screens/Welcome/Components/choice.dart';
 import 'package:finalapp/screens/auth/Login/Components/reset_password_page.dart';
 import 'package:finalapp/screens/auth/Login/login-screen.dart';
 import 'package:finalapp/screens/doctor_home/doctor_home.dart';
+import 'package:finalapp/screens/doctor_home/waiting_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
@@ -30,6 +31,7 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
   String passwordVal = "";
   bool hidePassword = true;
   late String userID;
+  bool isFound = true;
 
   @override
   void initState() {
@@ -86,7 +88,7 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
     }
   }
 
-  Future<void> getDoctorById(String doctorId) async {
+  Future<void> getDoctorById(String doctorId, User currentUser) async {
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('Doctors')
@@ -105,6 +107,10 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
           print("You are not a doctor!!");
         }
       } else {
+        isFound = false;
+        isDoctor = true;
+        currentUser.delete();
+        signIn();
         print('Doctor not found');
       }
     } catch (e) {
@@ -123,14 +129,24 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
       );
       final User currentUser = userCredential.user!;
       id = currentUser.uid;
-      await getDoctorById(id);
+      await getDoctorById(id, currentUser);
+      print(Doctor.isApproved);
       if (isDoctor == true) {
-        Navigator.pop(context);
+        if (Doctor.isApproved == true) {
+          Navigator.pop(context);
 
-        Navigator.push(context,
-            MaterialPageRoute(builder: (BuildContext context) {
-          return const DoctorHome();
-        }));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (BuildContext context) {
+            return const DoctorHome();
+          }));
+        } else if (isFound == true && Doctor.isApproved == false) {
+          Navigator.pop(context);
+
+          Navigator.push(context,
+              MaterialPageRoute(builder: (BuildContext context) {
+            return const WaitingPage();
+          }));
+        }
       } else {
         Navigator.pop(context);
         showDialog(
@@ -183,9 +199,6 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
           },
         );
       }
-      //send user to homePage
-      // Route newRoute = MaterialPageRoute(builder: (c) => const Scaffold());
-      // Navigator.pushReplacement(context, newRoute);
     } on FirebaseAuthException catch (e) {
       print(e.toString());
       Navigator.pop(context);
@@ -230,7 +243,7 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              margin: const EdgeInsets.only(top: 100),
+              margin: const EdgeInsets.only(top: 40),
               child: const Text(
                 "Connectez vous",
                 style: TextStyle(
@@ -249,7 +262,7 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
                     color: kPrimaryColor),
               ),
             ),
-            const SizedBox(height: 150),
+            const SizedBox(height: 50),
             TextFieldContainer(
               child: TextFormField(
                 keyboardType: TextInputType.emailAddress,
@@ -294,10 +307,6 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
               height: 60,
               child: TextButton(
                   onPressed: () {
-                    emailVal = myController1.text;
-                    print("email = $emailVal");
-                    passwordVal = myController2.text;
-                    print("password = $passwordVal");
                     formValidation();
                   },
                   style: ButtonStyle(

@@ -134,7 +134,7 @@ class ConsultationCard extends StatelessWidget {
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(20))),
                               content: const Text(
-                                  "vous êtes sur le point de supprimer une consultation!\nvoulez-vous vraiment la supprimer?"),
+                                  "vous êtes sur le point de supprimer un rendez-vous!\nvoulez-vous vraiment la supprimer?"),
                               actions: [
                                 ElevatedButton(
                                     style: ButtonStyle(

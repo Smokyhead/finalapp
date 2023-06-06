@@ -83,16 +83,31 @@ class _PNotifPageState extends State<PNotifPage> {
                                     content: SizedBox(
                                       height: 128,
                                       child: Column(children: [
-                                        ListTile(
-                                          onTap: () {
-                                            FirebaseFirestore.instance
-                                                .collection("Notifications")
-                                                .doc(data['id'])
-                                                .update({"read": true});
-                                            Navigator.pop(context);
-                                          },
-                                          title: const Text("Marquer comme lu"),
-                                        ),
+                                        data['read'] == false
+                                            ? ListTile(
+                                                onTap: () {
+                                                  FirebaseFirestore.instance
+                                                      .collection(
+                                                          "Notifications")
+                                                      .doc(data['id'])
+                                                      .update({"read": true});
+                                                  Navigator.pop(context);
+                                                },
+                                                title: const Text(
+                                                    "Marquer comme lu"),
+                                              )
+                                            : ListTile(
+                                                onTap: () {
+                                                  FirebaseFirestore.instance
+                                                      .collection(
+                                                          "Notifications")
+                                                      .doc(data['id'])
+                                                      .update({"read": false});
+                                                  Navigator.pop(context);
+                                                },
+                                                title: const Text(
+                                                    "Marquer comme non lu"),
+                                              ),
                                         const Divider(),
                                         ListTile(
                                           onTap: () {
@@ -162,17 +177,32 @@ class _PNotifPageState extends State<PNotifPage> {
                                       content: SizedBox(
                                         height: 128,
                                         child: Column(children: [
-                                          ListTile(
-                                            onTap: () {
-                                              FirebaseFirestore.instance
-                                                  .collection("Notifications")
-                                                  .doc(data['id'])
-                                                  .update({"read": true});
-                                              Navigator.pop(context);
-                                            },
-                                            title:
-                                                const Text("Marquer comme lu"),
-                                          ),
+                                          data['read'] == false
+                                              ? ListTile(
+                                                  onTap: () {
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            "Notifications")
+                                                        .doc(data['id'])
+                                                        .update({"read": true});
+                                                    Navigator.pop(context);
+                                                  },
+                                                  title: const Text(
+                                                      "Marquer comme lu"),
+                                                )
+                                              : ListTile(
+                                                  onTap: () {
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            "Notifications")
+                                                        .doc(data['id'])
+                                                        .update(
+                                                            {"read": false});
+                                                    Navigator.pop(context);
+                                                  },
+                                                  title: const Text(
+                                                      "Marquer comme non lu"),
+                                                ),
                                           const Divider(),
                                           ListTile(
                                             onTap: () {

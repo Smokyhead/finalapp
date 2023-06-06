@@ -7,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/Screens/Welcome/Components/background_welc.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
-import 'package:finalapp/screens/doctor_home/doctor_home.dart';
+import 'package:finalapp/screens/doctor_home/waiting_page.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:image_picker/image_picker.dart';
@@ -114,7 +114,7 @@ class _DPicSelectBodyState extends State<DPicSelectBody> {
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const DoctorHome()));
+                                builder: (context) => const WaitingPage()));
                       }
                     },
                     child: const Text(
@@ -259,7 +259,7 @@ class _DPicSelectBodyState extends State<DPicSelectBody> {
     } else {
       Timer(const Duration(seconds: 1), () {
         Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const DoctorHome()));
+            MaterialPageRoute(builder: (context) => const WaitingPage()));
       });
     }
   }

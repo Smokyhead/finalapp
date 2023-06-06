@@ -1,7 +1,13 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
+
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/appoint_model.dart';
+import 'package:finalapp/models/messaging.dart';
+import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/patient_home/home_screens/chat.dart';
+import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,10 +20,6 @@ class AppointPage extends StatefulWidget {
 }
 
 class _AppointPageState extends State<AppointPage> {
-  TextEditingController myController = TextEditingController();
-  bool typing = false;
-  String uuid = "";
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -27,7 +29,32 @@ class _AppointPageState extends State<AppointPage> {
         child: AppBar(
           backgroundColor: kPrimaryColor,
           foregroundColor: Colors.white,
-          title: const Text("Consultation"),
+          title: const Text("Rendez-vous"),
+          actions: [
+            IconButton(
+                padding: const EdgeInsets.only(right: 15),
+                onPressed: () {
+                  Conversation.id = "";
+                  FirestoreServices.getConv(
+                      Appointment.patientId, Appointment.doctorId);
+                  showDialog(
+                      context: (context),
+                      builder: (BuildContext context) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: kPrimaryColor,
+                          ),
+                        );
+                      });
+                  Timer(const Duration(seconds: 1), () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ChatPage()));
+                  });
+                },
+                icon: const Icon(IconlyBold.send))
+          ],
         ),
       ),
       body: SingleChildScrollView(
@@ -206,11 +233,14 @@ class _AppointPageState extends State<AppointPage> {
                               color: kPrimaryColor)),
                     ],
                   ),
-                  Text(Bill.fee == 0 ? "- TND   " : "${Bill.fee} TND",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 22.5,
-                      ))
+                  Container(
+                    margin: const EdgeInsets.only(right: 10),
+                    child: Text("${Bill.fee} TND",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 22.5,
+                        )),
+                  )
                 ],
               ),
             ),
@@ -266,29 +296,6 @@ class _AppointPageState extends State<AppointPage> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class TextFieldContainer extends StatelessWidget {
-  final Widget child;
-  const TextFieldContainer({
-    super.key,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-      width: size.width * 0.8,
-      height: 150,
-      decoration: BoxDecoration(
-          color: kPrimaryLightColor, borderRadius: BorderRadius.circular(5)),
-      child: child,
     );
   }
 }

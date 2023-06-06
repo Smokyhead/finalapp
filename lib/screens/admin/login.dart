@@ -18,16 +18,28 @@ class Connexion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          opacity: 0.5,
-          image: AssetImage('assets/images/Untitled design.jpg'),
-          fit: BoxFit.fill,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: AppBar(
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(15),
+            )),
+            backgroundColor: kPrimaryColor,
+            foregroundColor: Colors.white,
+            title: const Text("Admin"),
+          ),
         ),
-      ),
-      child: const ConnexionBody(),
-    ));
+        body: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              opacity: 0.5,
+              image: AssetImage('assets/images/Untitled design.jpg'),
+              fit: BoxFit.fill,
+            ),
+          ),
+          child: const ConnexionBody(),
+        ));
   }
 }
 
@@ -187,10 +199,10 @@ class _ConnexionBodyState extends State<ConnexionBody> {
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              margin: const EdgeInsets.only(top: 100),
+              margin: const EdgeInsets.only(bottom: 25),
               child: const Text(
                 "Connectez vous",
                 style: TextStyle(
@@ -199,7 +211,7 @@ class _ConnexionBodyState extends State<ConnexionBody> {
                     color: kPrimaryColor),
               ),
             ),
-            const SizedBox(height: 150),
+            const SizedBox(height: 50),
             TextFieldContainer(
               child: TextFormField(
                 keyboardType: TextInputType.emailAddress,
@@ -274,6 +286,9 @@ class _ConnexionBodyState extends State<ConnexionBody> {
                   'Récupérez Mot de passe',
                   style: TextStyle(color: Colors.blueGrey),
                 )),
+            const SizedBox(
+              height: 50,
+            )
           ],
         ),
       ),

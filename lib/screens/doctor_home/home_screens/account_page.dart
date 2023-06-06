@@ -510,10 +510,14 @@ class _AccountPageState extends State<AccountPage> {
                             const SizedBox(
                               width: 10,
                             ),
-                            Text(
-                              Doctor.email,
-                              style: const TextStyle(
-                                  fontSize: 17.5, fontWeight: FontWeight.w500),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Text(
+                                Doctor.email,
+                                style: const TextStyle(
+                                    fontSize: 17.5,
+                                    fontWeight: FontWeight.w500),
+                              ),
                             ),
                           ],
                         ),
@@ -767,29 +771,25 @@ class _AccountPageState extends State<AccountPage> {
                   height: 15,
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       const Text(
-                        'Services:',
+                        'Service:',
                         style: TextStyle(fontSize: 17.5),
                       ),
                       const SizedBox(
                         width: 10,
                       ),
-                      IconButton(
-                          onPressed: () {}, icon: const Icon(IconlyLight.edit))
+                      Text(
+                        Doctor.service,
+                        style: const TextStyle(fontSize: 17.5),
+                      )
                     ],
                   ),
                 ),
-                Wrap(
-                    spacing: 5,
-                    children: Doctor.services
-                        .map((e) => Chip(
-                              label: Text(e),
-                            ))
-                        .toList()),
                 const Divider(
                   thickness: 0.5,
                   color: kPrimaryColor,

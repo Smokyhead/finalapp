@@ -1,7 +1,10 @@
 // ignore_for_file: avoid_print
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
+import 'package:finalapp/models/users.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/home_page.dart';
+import 'package:finalapp/screens/doctor_home/home_screens/messaging_doc.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/notif_page.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/account_page.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +22,32 @@ class DoctorHome extends StatefulWidget {
 
 class _DoctorHomeState extends State<DoctorHome> {
   int currentPage = 0;
-  final screens = const [HomePage(), DNotifPage(), AccountPage()];
+  final screens = const [HomePage(), MessagingD(), DNotifPage(), AccountPage()];
+
+  Widget getConv() {
+    return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection("Conversations")
+            .where('doctor', isEqualTo: Doctor.uid)
+            .where('seenByDoctor', isEqualTo: false)
+            .snapshots(),
+        builder: (context, snapshots) {
+          if (snapshots.connectionState == ConnectionState.waiting) {
+            return const Text(
+              "0",
+              style: TextStyle(color: Colors.white),
+            );
+          } else {
+            nbConv = snapshots.data!.docs.length;
+            return Text(
+              snapshots.data!.docs.length.toString(),
+              style: const TextStyle(color: Colors.white),
+            );
+          }
+        });
+  }
+
+  static int? nbConv;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +70,15 @@ class _DoctorHomeState extends State<DoctorHome> {
           BottomBarItem(
             icon: const Icon(IconlyLight.home),
             title: const Text("Accueil"),
+            unSelectedColor: Colors.black,
+            selectedColor: kPrimaryColor,
+          ),
+          BottomBarItem(
+            icon: badges.Badge(
+                showBadge: nbConv == 0 ? false : true,
+                badgeContent: getConv(),
+                child: const Icon(IconlyLight.chat)),
+            title: const Text("Messages"),
             unSelectedColor: Colors.black,
             selectedColor: kPrimaryColor,
           ),

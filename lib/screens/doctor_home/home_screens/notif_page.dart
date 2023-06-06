@@ -52,7 +52,7 @@ class _DNotifPageState extends State<DNotifPage> {
               borderRadius: BorderRadius.vertical(
             bottom: Radius.circular(15),
           )),
-          automaticallyImplyLeading: false,
+          leading: const Icon(IconlyBroken.notification),
           backgroundColor: kPrimaryColor,
           foregroundColor: Colors.white,
           title: const Text("Notifications"),

@@ -10,65 +10,15 @@ import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:uuid/uuid.dart';
 
-class DoctorProfile extends StatefulWidget {
-  const DoctorProfile({super.key});
+class DoctorProfileSearch extends StatefulWidget {
+  const DoctorProfileSearch({super.key});
 
   @override
-  State<StatefulWidget> createState() => _DoctorProfileState();
+  State<StatefulWidget> createState() => _DoctorProfileSearchState();
 }
 
-class _DoctorProfileState extends State<DoctorProfile> {
-  final myController = TextEditingController();
-  String uuid = "";
-
-  Future submitFeedback() async {
-    if (myController.text.isEmpty) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text(
-                "OOPS!",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-              ),
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(20))),
-              content: const Text("Veuillez remplir le champ vide."),
-              actions: [
-                ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(kPrimaryColor),
-                      foregroundColor: MaterialStateProperty.all(Colors.white),
-                      shape: MaterialStateProperty.all(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30)),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("OK"))
-              ],
-            );
-          });
-    } else {
-      uuid = const Uuid().v4();
-      FirebaseFirestore.instance.collection("Feedbacks").doc(uuid).set({
-        "id": uuid,
-        "patientId": Patient.uid,
-        "patientName": "${Patient.firstName} ${Patient.lastName}",
-        "doctorId": Doctor.uid,
-        "doctorName": "${Doctor.firstName} ${Doctor.lastName}",
-        "feedback": myController.text
-      });
-      FirebaseFirestore.instance.collection('Doctors').doc(Doctor.uid).update({
-        'feedbacks': FieldValue.arrayUnion([uuid])
-      });
-    }
-  }
-
+class _DoctorProfileSearchState extends State<DoctorProfileSearch> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -79,30 +29,6 @@ class _DoctorProfileState extends State<DoctorProfile> {
           backgroundColor: kPrimaryColor,
           foregroundColor: Colors.white,
           title: const Text("Profil du docteur"),
-          actions: [
-            IconButton(
-                padding: const EdgeInsets.only(right: 15),
-                onPressed: () {
-                  Conversation.id = "";
-                  FirestoreServices.getConv(Patient.uid, Doctor.uid);
-                  showDialog(
-                      context: (context),
-                      builder: (BuildContext context) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: kPrimaryColor,
-                          ),
-                        );
-                      });
-                  Timer(const Duration(seconds: 1), () {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ChatPage()));
-                  });
-                },
-                icon: const Icon(IconlyBold.send))
-          ],
         ),
       ),
       body: SingleChildScrollView(
@@ -304,75 +230,6 @@ class _DoctorProfileState extends State<DoctorProfile> {
             const SizedBox(
               height: 10,
             ),
-            TextButton(
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text(
-                            "Comment vous trouvez ce docteur?",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 17),
-                          ),
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20))),
-                          content: TextFieldContainer(
-                            child: TextField(
-                              textCapitalization: TextCapitalization.sentences,
-                              controller: myController,
-                              keyboardType: TextInputType.multiline,
-                              maxLines: 6,
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Tapez votre réponse ici",
-                              ),
-                            ),
-                          ),
-                          actions: [
-                            ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all(kPrimaryColor),
-                                  foregroundColor:
-                                      MaterialStateProperty.all(Colors.white),
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30)),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text("Annuler")),
-                            ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all(kPrimaryColor),
-                                  foregroundColor:
-                                      MaterialStateProperty.all(Colors.white),
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30)),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  submitFeedback();
-                                  Navigator.pop(context);
-                                },
-                                child: const Text("Valider"))
-                          ],
-                        );
-                      });
-                },
-                child: const Text(
-                  "Ajoutez un feedback",
-                  style: TextStyle(
-                      color: kPrimaryColor, fontWeight: FontWeight.bold),
-                )),
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('Feedbacks')

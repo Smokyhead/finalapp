@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Patients extends StatefulWidget {
   const Patients({super.key});
@@ -89,26 +90,63 @@ class _PatientsState extends State<Patients> {
 
                         if (name.isEmpty) {
                           return Card(
-                            margin: const EdgeInsets.only(top: 10, bottom: 10),
-                            elevation: 2.5,
-                            color: const Color.fromARGB(255, 243, 243, 243),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20)),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(10),
-                              title: Text(
-                                  "${data['firstName']} ${data['lastName']}\n${data['phone']}"),
-                              leading: CircleAvatar(
-                                backgroundColor:
-                                    const Color.fromARGB(255, 203, 203, 203),
-                                backgroundImage: const AssetImage(
-                                    "assets/images/avatar.jpg"),
-                                foregroundImage: data['imageUrl'].isEmpty
-                                    ? null
-                                    : NetworkImage(data['imageUrl']),
-                              ),
-                            ),
-                          );
+                              margin:
+                                  const EdgeInsets.only(top: 10, bottom: 10),
+                              elevation: 2.5,
+                              color: const Color.fromARGB(255, 243, 243, 243),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.all(10),
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "${data['firstName']} ${data['lastName']}",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                    ),
+                                    Text(
+                                      "${data['phone']}",
+                                      style: const TextStyle(height: 1.2),
+                                    )
+                                  ],
+                                ),
+                                subtitle: Text(
+                                  "${data['userEmail']}",
+                                  style: const TextStyle(height: 1.2),
+                                ),
+                                leading: CircleAvatar(
+                                  radius: 30,
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 203, 203, 203),
+                                  backgroundImage: const AssetImage(
+                                      "assets/images/avatar.jpg"),
+                                  foregroundImage: data['imageUrl'].isEmpty
+                                      ? null
+                                      : NetworkImage(data['imageUrl']),
+                                ),
+                                trailing: Container(
+                                  margin: const EdgeInsets.only(right: 15),
+                                  child: CircleAvatar(
+                                    radius: 20,
+                                    backgroundColor: Colors.green,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        final Uri url = Uri(
+                                            scheme: 'tel', path: data['phone']);
+                                        launchUrl(url);
+                                      },
+                                      icon: const Icon(
+                                        Icons.call,
+                                        size: 20,
+                                      ),
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ));
                         } else if (data['lastName']
                                 .toString()
                                 .toLowerCase()
@@ -117,31 +155,68 @@ class _PatientsState extends State<Patients> {
                                 .toString()
                                 .toLowerCase()
                                 .contains(name.toLowerCase()) ||
-                            data['services']
+                            data['phone']
                                 .toString()
                                 .toLowerCase()
                                 .contains(name.toLowerCase())) {
                           return Card(
-                            margin: const EdgeInsets.only(top: 10, bottom: 10),
-                            elevation: 2.5,
-                            color: const Color.fromARGB(255, 243, 243, 243),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20)),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(10),
-                              title: Text(
-                                  "${data['firstName']} ${data['lastName']}\n${data['phone']}"),
-                              leading: CircleAvatar(
-                                backgroundColor:
-                                    const Color.fromARGB(255, 203, 203, 203),
-                                backgroundImage: const AssetImage(
-                                    "assets/images/avatar.jpg"),
-                                foregroundImage: data['imageUrl'].isEmpty
-                                    ? null
-                                    : NetworkImage(data['imageUrl']),
-                              ),
-                            ),
-                          );
+                              margin:
+                                  const EdgeInsets.only(top: 10, bottom: 10),
+                              elevation: 2.5,
+                              color: const Color.fromARGB(255, 243, 243, 243),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.all(10),
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "${data['firstName']} ${data['lastName']}",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                    ),
+                                    Text(
+                                      "${data['phone']}",
+                                      style: const TextStyle(height: 1.2),
+                                    )
+                                  ],
+                                ),
+                                subtitle: Text(
+                                  "${data['userEmail']}",
+                                  style: const TextStyle(height: 1.2),
+                                ),
+                                leading: CircleAvatar(
+                                  radius: 30,
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 203, 203, 203),
+                                  backgroundImage: const AssetImage(
+                                      "assets/images/avatar.jpg"),
+                                  foregroundImage: data['imageUrl'].isEmpty
+                                      ? null
+                                      : NetworkImage(data['imageUrl']),
+                                ),
+                                trailing: Container(
+                                  margin: const EdgeInsets.only(right: 15),
+                                  child: CircleAvatar(
+                                    radius: 20,
+                                    backgroundColor: Colors.green,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        final Uri url = Uri(
+                                            scheme: 'tel', path: data['phone']);
+                                        launchUrl(url);
+                                      },
+                                      icon: const Icon(
+                                        Icons.call,
+                                        size: 20,
+                                      ),
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ));
                         }
                         return Container();
                       }),

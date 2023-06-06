@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/screens/patient_home/doctor_profile.dart';
+import 'package:finalapp/screens/patient_home/home_screens/doctor.dart';
 import 'package:finalapp/screens/patient_home/widgets/appointment.dart';
 import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
@@ -115,25 +116,35 @@ class _SearchPageState extends State<SearchPage> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              const DoctorProfile()));
+                                              const DoctorProfileSearch()));
                                 });
                               },
                               contentPadding: const EdgeInsets.all(10),
-                              title: Text(
-                                  "${data['firstName']} ${data['lastName']}\n${data['phone']}"),
-                              subtitle: Text(
-                                data['services'].toString().substring(1,
-                                    (data['services'].toString().length) - 1),
-                                maxLines: 1,
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${data['firstName']} ${data['lastName']}",
+                                    style: const TextStyle(
+                                        height: 2,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
+                                  Text("${data['phone']}")
+                                ],
                               ),
+                              subtitle: Text(data['service']),
                               leading: CircleAvatar(
+                                radius: 30,
                                 backgroundColor:
                                     const Color.fromARGB(255, 203, 203, 203),
                                 backgroundImage: const AssetImage(
                                     "assets/images/avatar.jpg"),
                                 foregroundImage: data['imageUrl'].isEmpty
                                     ? null
-                                    : NetworkImage(data['imageUrl']),
+                                    : NetworkImage(
+                                        data['imageUrl'],
+                                      ),
                               ),
                               trailing: TextButton(
                                   onPressed: () {
@@ -184,7 +195,11 @@ class _SearchPageState extends State<SearchPage> {
                                 .toString()
                                 .toLowerCase()
                                 .contains(name.toLowerCase()) ||
-                            data['services']
+                            data['service']
+                                .toString()
+                                .toLowerCase()
+                                .contains(name.toLowerCase()) ||
+                            data['phone']
                                 .toString()
                                 .toLowerCase()
                                 .contains(name.toLowerCase())) {
@@ -213,18 +228,26 @@ class _SearchPageState extends State<SearchPage> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              const DoctorProfile()));
+                                              const DoctorProfileSearch()));
                                 });
                               },
                               contentPadding: const EdgeInsets.all(10),
-                              title: Text(
-                                  "${data['firstName']} ${data['lastName']}\n${data['phone']}"),
-                              subtitle: Text(
-                                data['services'].toString().substring(1,
-                                    (data['services'].toString().length) - 1),
-                                maxLines: 1,
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${data['firstName']} ${data['lastName']}",
+                                    style: const TextStyle(
+                                        height: 2,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
+                                  Text("${data['phone']}")
+                                ],
                               ),
+                              subtitle: Text(data['service']),
                               leading: CircleAvatar(
+                                radius: 30,
                                 backgroundColor:
                                     const Color.fromARGB(255, 203, 203, 203),
                                 backgroundImage: const AssetImage(

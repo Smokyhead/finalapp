@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/screens/Welcome/welcome_screen.dart';
 import 'package:finalapp/screens/admin/home/consultations.dart';
 import 'package:finalapp/screens/admin/home/doctors_list_admin.dart';
+import 'package:finalapp/screens/admin/home/feedbacks.dart';
 import 'package:finalapp/screens/admin/home/holidays.dart';
+import 'package:finalapp/screens/admin/home/notifs.dart';
 import 'package:finalapp/screens/admin/home/patients_list_admin.dart';
 import 'package:finalapp/screens/admin/home/services.dart';
 import 'package:finalapp/services/firestoreServices.dart';
@@ -23,12 +26,37 @@ class _AdminHomeState extends State<AdminHome> {
     super.initState();
   }
 
+  Widget getNT() {
+    return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection("Doctors")
+            .where('isApproved', isEqualTo: false)
+            .snapshots(),
+        builder: (context, snapshots) {
+          if (snapshots.connectionState == ConnectionState.waiting) {
+            return const Text(
+              "0",
+              style: TextStyle(color: Colors.white),
+            );
+          } else {
+            return Text(
+              snapshots.data!.docs.length.toString(),
+              style: const TextStyle(color: Colors.white),
+            );
+          }
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
         child: AppBar(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(15),
+          )),
           elevation: 10,
           automaticallyImplyLeading: false,
           backgroundColor: kPrimaryColor,
@@ -41,15 +69,12 @@ class _AdminHomeState extends State<AdminHome> {
                 padding: const EdgeInsets.only(right: 15),
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return const Scaffold();
+                    return const Notifs();
                   }));
                 },
-                icon: const badges.Badge(
-                    badgeContent: Text(
-                      "0",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    child: Icon(IconlyBold.notification))),
+                icon: badges.Badge(
+                    badgeContent: getNT(),
+                    child: const Icon(IconlyBold.notification))),
             IconButton(
                 padding: const EdgeInsets.only(right: 15),
                 onPressed: () {
@@ -96,7 +121,7 @@ class _AdminHomeState extends State<AdminHome> {
                   return const Consultations();
                 }));
               },
-              text: "Consultations",
+              text: "Rendez-vous",
               icon: const Icon(Icons.punch_clock_outlined),
             ),
           ),
@@ -123,6 +148,18 @@ class _AdminHomeState extends State<AdminHome> {
               text: "Jours fériés",
               icon: const Icon(Icons.access_time),
             ),
+          ),
+          Expanded(
+            child: Button(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                  return const FeedbacksAdmin();
+                }));
+              },
+              text: "Feedbacks",
+              icon: const Icon(Icons.access_time),
+            ),
           )
         ],
       ),
@@ -144,7 +181,7 @@ class Button extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      margin: const EdgeInsets.all(30),
+      margin: const EdgeInsets.all(15),
       width: size.width * 0.9,
       child: TextButton(
         style: ButtonStyle(

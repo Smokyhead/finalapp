@@ -348,10 +348,10 @@ class _BodyState extends State<Body> {
     return Background(
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <
+        child: Column(mainAxisAlignment: MainAxisAlignment.start, children: <
             Widget>[
           Container(
-            margin: const EdgeInsetsDirectional.only(top: 75),
+            margin: const EdgeInsetsDirectional.only(top: 15),
             child: const Text(
               "Inscrivez vous",
               style: TextStyle(

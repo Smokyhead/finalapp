@@ -26,133 +26,122 @@ class _AppFeedback extends State<AppFeedback> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: AppBar(
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(15),
+            )),
+            backgroundColor: kPrimaryColor,
+            foregroundColor: Colors.white,
+            title: const Text("Feedback"),
+          ),
+        ),
         body: SingleChildScrollView(
-      child: SafeArea(
-          child: Padding(
-        padding: const EdgeInsets.only(left: 40, right: 40, top: 120),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                margin: const EdgeInsets.only(top: 1),
-                child: const Text(
-                  'Aimez-vous l\'application?',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25,
-                    color: kPrimaryColor,
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 100,
-              ),
-              const SizedBox(
-                width: 300,
-                child: Text(
-                  'Donnez votre avis pour nous aider à ameliorer l\'application :',
-                  style: TextStyle(
-                    fontSize: 20,
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              TextFieldContainer(
-                child: TextField(
-                  textCapitalization: TextCapitalization.sentences,
-                  controller: controller,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 6,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "Tapez votre réponse ici",
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 100,
-              ),
-              SizedBox(
-                  height: 55,
-                  width: 150,
-                  child: TextButton(
-                      style: ButtonStyle(
-                        elevation: MaterialStateProperty.all(10),
-                        backgroundColor:
-                            MaterialStateProperty.all(kPrimaryColor),
-                        foregroundColor:
-                            MaterialStateProperty.all(Colors.white),
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                        ),
+          child: SafeArea(
+              child: Padding(
+            padding: const EdgeInsets.only(left: 40, right: 40, top: 30),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    margin: const EdgeInsets.only(top: 1),
+                    child: const Text(
+                      'Aimez-vous l\'application?',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                        color: kPrimaryColor,
                       ),
-                      child: const Text(
-                        'Valider',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  const SizedBox(
+                    width: 300,
+                    child: Text(
+                      'Donnez votre avis pour nous aider à ameliorer l\'application :',
+                      style: TextStyle(
+                        fontSize: 20,
                       ),
-                      onPressed: () {
-                        uuid = const Uuid().v4();
-                        FirebaseFirestore.instance
-                            .collection('AppFeedbacks')
-                            .doc(uuid)
-                            .set({
-                          'userId': Patient.uid,
-                          'userRole': 'patient',
-                          'feedback': controller.text.trim(),
-                          'dateTime': dateTime
-                        });
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext build) {
-                              return const AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20))),
-                                content: Text(
-                                  "Votre feedback a était envoyée avec succés",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: kPrimaryColor),
-                                ),
-                              );
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  TextFieldContainer(
+                    child: TextField(
+                      textCapitalization: TextCapitalization.sentences,
+                      controller: controller,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 6,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Tapez votre réponse ici",
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  SizedBox(
+                      height: 55,
+                      width: 150,
+                      child: TextButton(
+                          style: ButtonStyle(
+                            elevation: MaterialStateProperty.all(10),
+                            backgroundColor:
+                                MaterialStateProperty.all(kPrimaryColor),
+                            foregroundColor:
+                                MaterialStateProperty.all(Colors.white),
+                            shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15)),
+                            ),
+                          ),
+                          child: const Text(
+                            'Valider',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                          onPressed: () {
+                            uuid = const Uuid().v4();
+                            FirebaseFirestore.instance
+                                .collection('AppFeedbacks')
+                                .doc(uuid)
+                                .set({
+                              'userId': Patient.uid,
+                              'firstName': Patient.firstName,
+                              'lastName': Patient.lastName,
+                              'userRole': 'patient',
+                              'feedback': controller.text.trim(),
+                              'dateTime': dateTime
                             });
-                        Timer(const Duration(seconds: 2), () {
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        });
-                      })),
-              const SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                  height: 55,
-                  width: 150,
-                  child: TextButton(
-                      style: ButtonStyle(
-                        elevation: MaterialStateProperty.all(10),
-                        backgroundColor:
-                            MaterialStateProperty.all(kPrimaryColor),
-                        foregroundColor:
-                            MaterialStateProperty.all(Colors.white),
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                        ),
-                      ),
-                      child: const Text(
-                        'Retour',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      }))
-            ]),
-      )),
-    ));
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext build) {
+                                  return const AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20))),
+                                    content: Text(
+                                      "Votre feedback a était envoyée avec succés",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: kPrimaryColor),
+                                    ),
+                                  );
+                                });
+                            Timer(const Duration(seconds: 2), () {
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            });
+                          })),
+                ]),
+          )),
+        ));
   }
 }
 

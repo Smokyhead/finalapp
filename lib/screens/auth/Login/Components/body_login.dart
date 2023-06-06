@@ -229,7 +229,7 @@ class _BodyState extends State<Body> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              margin: const EdgeInsets.only(top: 100),
+              margin: const EdgeInsets.only(top: 40),
               child: const Text(
                 "Connectez vous",
                 style: TextStyle(
@@ -248,7 +248,7 @@ class _BodyState extends State<Body> {
                     color: kPrimaryColor),
               ),
             ),
-            const SizedBox(height: 150),
+            const SizedBox(height: 50),
             TextFieldContainer(
               child: TextFormField(
                 keyboardType: TextInputType.emailAddress,

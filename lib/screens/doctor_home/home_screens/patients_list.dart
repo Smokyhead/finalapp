@@ -4,7 +4,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
+import 'package:finalapp/models/messaging.dart';
 import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/doctor_home/home_screens/chat_doc.dart';
 import 'package:finalapp/screens/doctor_home/home_screens/patient_profile.dart';
 import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +68,7 @@ class _PatientsListState extends State<PatientsList> {
             Padding(
               padding: const EdgeInsets.only(right: 15),
               child: IconButton(
-                icon: Icon(typing ? Icons.done : IconlyBold.search),
+                icon: Icon(typing ? Icons.done : IconlyLight.search),
                 onPressed: () {
                   setState(() {
                     typing = !typing;
@@ -94,7 +96,7 @@ class _PatientsListState extends State<PatientsList> {
           if (docs == null || docs.isEmpty) {
             return const Center(
               child: Text(
-                "Vous n'avez aucun docteur pour le moment",
+                "Vous n'avez aucun patient pour le moment",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -159,23 +161,60 @@ class _PatientsListState extends State<PatientsList> {
                             data['phone'],
                             style: const TextStyle(fontSize: 13),
                           ),
-                          trailing: Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: CircleAvatar(
-                              radius: 20,
-                              backgroundColor: Colors.green,
-                              child: IconButton(
-                                onPressed: () async {
-                                  final Uri url =
-                                      Uri(scheme: 'tel', path: data['phone']);
-                                  launchUrl(url);
-                                },
-                                icon: const Icon(
-                                  IconlyBold.call,
-                                  size: 20,
+                          trailing: SizedBox(
+                            width: 100,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CircleAvatar(
+                                    radius: 20,
+                                    backgroundColor: kPrimaryColor,
+                                    child: IconButton(
+                                        onPressed: () {
+                                          Conversation.id = "";
+                                          FirestoreServices.getPatientById(
+                                              data['userUID']);
+                                          FirestoreServices.getConv(
+                                              data['userUID'], Doctor.uid);
+                                          showDialog(
+                                              context: (context),
+                                              builder: (BuildContext context) {
+                                                return const Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    color: kPrimaryColor,
+                                                  ),
+                                                );
+                                              });
+                                          Timer(const Duration(seconds: 1), () {
+                                            Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const ChatPageD()));
+                                          });
+                                        },
+                                        icon: const Icon(
+                                          IconlyBold.send,
+                                          size: 20,
+                                        ))),
+                                CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: Colors.green,
+                                  child: IconButton(
+                                    onPressed: () async {
+                                      final Uri url = Uri(
+                                          scheme: 'tel', path: data['phone']);
+                                      launchUrl(url);
+                                    },
+                                    icon: const Icon(
+                                      IconlyBold.call,
+                                      size: 20,
+                                    ),
+                                    color: Colors.white,
+                                  ),
                                 ),
-                                color: Colors.white,
-                              ),
+                              ],
                             ),
                           ),
                         ),
@@ -195,9 +234,9 @@ class _PatientsListState extends State<PatientsList> {
                             borderRadius: BorderRadius.circular(20)),
                         child: ListTile(
                           onTap: () {
-                            final id = data['userUID'];
-                            print(id);
-                            FirestoreServices.getDoctorById(id);
+                            FirestoreServices.getPatientById(data['userUID']);
+                            FirestoreServices.getObs(
+                                data['userUID'], Doctor.uid);
                             showDialog(
                                 context: (context),
                                 builder: (BuildContext context) {
@@ -211,7 +250,8 @@ class _PatientsListState extends State<PatientsList> {
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const Scaffold()));
+                                      builder: (context) =>
+                                          const PatientProfile()));
                             });
                           },
                           contentPadding: const EdgeInsets.all(10),
@@ -234,19 +274,60 @@ class _PatientsListState extends State<PatientsList> {
                             data['phone'],
                             style: const TextStyle(fontSize: 13),
                           ),
-                          trailing: Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: CircleAvatar(
-                              radius: 20,
-                              backgroundColor: Colors.green,
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  IconlyBold.call,
-                                  size: 20,
+                          trailing: SizedBox(
+                            width: 100,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CircleAvatar(
+                                    radius: 20,
+                                    backgroundColor: kPrimaryColor,
+                                    child: IconButton(
+                                        onPressed: () {
+                                          Conversation.id = "";
+                                          FirestoreServices.getPatientById(
+                                              data['userUID']);
+                                          FirestoreServices.getConv(
+                                              data['userUID'], Doctor.uid);
+                                          showDialog(
+                                              context: (context),
+                                              builder: (BuildContext context) {
+                                                return const Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    color: kPrimaryColor,
+                                                  ),
+                                                );
+                                              });
+                                          Timer(const Duration(seconds: 1), () {
+                                            Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const ChatPageD()));
+                                          });
+                                        },
+                                        icon: const Icon(
+                                          IconlyBold.send,
+                                          size: 20,
+                                        ))),
+                                CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: Colors.green,
+                                  child: IconButton(
+                                    onPressed: () async {
+                                      final Uri url = Uri(
+                                          scheme: 'tel', path: data['phone']);
+                                      launchUrl(url);
+                                    },
+                                    icon: const Icon(
+                                      IconlyBold.call,
+                                      size: 20,
+                                    ),
+                                    color: Colors.white,
+                                  ),
                                 ),
-                                color: Colors.white,
-                              ),
+                              ],
                             ),
                           ),
                         ),

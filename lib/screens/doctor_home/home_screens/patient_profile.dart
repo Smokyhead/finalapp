@@ -1,9 +1,13 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
+import 'package:finalapp/models/messaging.dart';
 import 'package:finalapp/models/observation_model.dart';
 import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/doctor_home/home_screens/chat_doc.dart';
 import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
@@ -25,6 +29,38 @@ class _PatientProfileState extends State<PatientProfile> {
     FirestoreServices.getObsbyId(Observation.id);
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: AppBar(
+          backgroundColor: kPrimaryColor,
+          foregroundColor: Colors.white,
+          title: const Text("Profil du patient"),
+          actions: [
+            IconButton(
+                padding: const EdgeInsets.only(right: 15),
+                onPressed: () {
+                  Conversation.id = "";
+                  FirestoreServices.getConv(Patient.uid, Doctor.uid);
+                  showDialog(
+                      context: (context),
+                      builder: (BuildContext context) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: kPrimaryColor,
+                          ),
+                        );
+                      });
+                  Timer(const Duration(seconds: 1), () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ChatPageD()));
+                  });
+                },
+                icon: const Icon(IconlyBold.send))
+          ],
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -32,7 +68,7 @@ class _PatientProfileState extends State<PatientProfile> {
           children: [
             Container(
               width: size.width,
-              height: size.height * 0.4,
+              height: size.height * 0.35,
               decoration: const BoxDecoration(
                 boxShadow: [
                   BoxShadow(
@@ -54,7 +90,7 @@ class _PatientProfileState extends State<PatientProfile> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   CircleAvatar(
                     radius: 90,
@@ -273,30 +309,6 @@ class _PatientProfileState extends State<PatientProfile> {
 
             const SizedBox(
               height: 25,
-            ),
-            SizedBox(
-              height: 60,
-              width: 130,
-              child: TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ButtonStyle(
-                    side: MaterialStateProperty.all(const BorderSide(
-                        style: BorderStyle.solid, color: kPrimaryColor)),
-                    elevation: MaterialStateProperty.all(6),
-                    backgroundColor:
-                        MaterialStateProperty.all(kPrimaryLightColor),
-                    foregroundColor: MaterialStateProperty.all(kPrimaryColor),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                    ),
-                  ),
-                  child: const Text(
-                    "Retour",
-                    style: TextStyle(fontSize: 23.5),
-                  )),
             ),
           ],
         ),

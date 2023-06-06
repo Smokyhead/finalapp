@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:finalapp/constants.dart';
+import 'package:finalapp/screens/admin/home/consultation_page.dart';
+import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
@@ -72,6 +76,25 @@ class _ConsultationsState extends State<Consultations> {
     return itemsHeights;
   }
 
+  void toAppointPage(String consId, String docId, String patId) {
+    FirestoreServices.getappointById(consId);
+    FirestoreServices.getDoctorById(docId);
+    FirestoreServices.getPatientById(patId);
+    showDialog(
+        context: (context),
+        builder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: kPrimaryColor,
+            ),
+          );
+        });
+    Timer(const Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const Appoint()));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,7 +134,7 @@ class _ConsultationsState extends State<Consultations> {
                               TextStyle(color: Colors.black, fontSize: 20)),
                     ),
                   )
-                : const Text("Consultations"),
+                : const Text("Rendez-vous"),
             actions: [
               IconButton(
                 padding: const EdgeInsets.only(right: 5),
@@ -193,7 +216,7 @@ class _ConsultationsState extends State<Consultations> {
                     if (docs == null || docs.isEmpty) {
                       return const Center(
                         child: Text(
-                          "Vous n'avez aucune consultation pour le moment",
+                          "Vous n'avez aucun rendez-vous pour le moment",
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
@@ -232,7 +255,10 @@ class _ConsultationsState extends State<Consultations> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20)),
                                 child: ListTile(
-                                  onTap: () {},
+                                  onTap: () {
+                                    toAppointPage(data['id'], data['doctorId'],
+                                        data['patientId']);
+                                  },
                                   contentPadding: const EdgeInsets.all(5),
                                   leading: CircleAvatar(
                                     radius: 30,
@@ -398,7 +424,7 @@ class _ConsultationsState extends State<Consultations> {
           if (docs == null || docs.isEmpty) {
             return const Center(
               child: Text(
-                "Vous n'avez aucune consultation pour le moment",
+                "Vous n'avez aucun rendez-vous pour le moment",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -425,7 +451,10 @@ class _ConsultationsState extends State<Consultations> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
                       child: ListTile(
-                        onTap: () {},
+                        onTap: () {
+                          toAppointPage(
+                              data['id'], data['doctorId'], data['patientId']);
+                        },
                         contentPadding: const EdgeInsets.all(5),
                         leading: CircleAvatar(
                           radius: 30,
@@ -577,7 +606,7 @@ class _ConsultationsState extends State<Consultations> {
           if (docs == null || docs.isEmpty) {
             return const Center(
               child: Text(
-                "Vous n'avez aucune consultation pour le moment",
+                "Vous n'avez aucun rendez-vous pour le moment",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -613,7 +642,10 @@ class _ConsultationsState extends State<Consultations> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
                       child: ListTile(
-                        onTap: () {},
+                        onTap: () {
+                          toAppointPage(
+                              data['id'], data['doctorId'], data['patientId']);
+                        },
                         contentPadding: const EdgeInsets.all(5),
                         leading: CircleAvatar(
                           radius: 30,
@@ -687,7 +719,10 @@ class _ConsultationsState extends State<Consultations> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
                       child: ListTile(
-                        onTap: () {},
+                        onTap: () {
+                          toAppointPage(
+                              data['id'], data['doctorId'], data['patientId']);
+                        },
                         contentPadding: const EdgeInsets.all(5),
                         leading: CircleAvatar(
                           radius: 30,
@@ -766,7 +801,7 @@ class _ConsultationsState extends State<Consultations> {
           if (docs == null || docs.isEmpty) {
             return const Center(
               child: Text(
-                "Vous n'avez aucune consultation pour le moment",
+                "Vous n'avez aucun rendez-vous pour le moment",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -802,7 +837,10 @@ class _ConsultationsState extends State<Consultations> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
                       child: ListTile(
-                        onTap: () {},
+                        onTap: () {
+                          toAppointPage(
+                              data['id'], data['doctorId'], data['patientId']);
+                        },
                         contentPadding: const EdgeInsets.all(5),
                         leading: CircleAvatar(
                           radius: 30,

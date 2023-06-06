@@ -3,6 +3,7 @@ import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
 import 'package:finalapp/screens/patient_home/home_screens/account_page.dart';
 import 'package:finalapp/screens/patient_home/home_screens/home_page.dart';
+import 'package:finalapp/screens/patient_home/home_screens/messaging.dart';
 import 'package:finalapp/screens/patient_home/home_screens/notif_page.dart';
 import 'package:finalapp/screens/patient_home/home_screens/search_page.dart';
 import 'package:flutter/material.dart';
@@ -23,21 +24,60 @@ class _PatientHomeState extends State<PatientHome> {
   final screens = const [
     HomePage(),
     SearchPage(),
+    Messaging(),
     PNotifPage(),
     AccountPage(),
   ];
-  static int? nb;
+  Widget getNT() {
+    return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection("Notifications")
+            .where('patient', isEqualTo: Patient.uid)
+            .where('read', isEqualTo: false)
+            .snapshots(),
+        builder: (context, snapshots) {
+          if (snapshots.connectionState == ConnectionState.waiting) {
+            return const Text(
+              "0",
+              style: TextStyle(color: Colors.white),
+            );
+          } else {
+            nbNot = snapshots.data!.docs.length;
+            return Text(
+              snapshots.data!.docs.length.toString(),
+              style: const TextStyle(color: Colors.white),
+            );
+          }
+        });
+  }
+
+  Widget getConv() {
+    return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection("Conversations")
+            .where('patient', isEqualTo: Patient.uid)
+            .where('seenByPatient', isEqualTo: false)
+            .snapshots(),
+        builder: (context, snapshots) {
+          if (snapshots.connectionState == ConnectionState.waiting) {
+            return const Text(
+              "0",
+              style: TextStyle(color: Colors.white),
+            );
+          } else {
+            nbConv = snapshots.data!.docs.length;
+            return Text(
+              snapshots.data!.docs.length.toString(),
+              style: const TextStyle(color: Colors.white),
+            );
+          }
+        });
+  }
+
+  static int? nbNot;
+  static int? nbConv;
   @override
   Widget build(BuildContext context) {
-    FirebaseFirestore.instance
-        .collection('Notifications')
-        .where('read', isEqualTo: false)
-        .where('patient', isEqualTo: Patient.uid)
-        .snapshots()
-        .listen((event) {
-      int unreadCount = event.docs.length;
-      nb = unreadCount;
-    });
     return Scaffold(
       body: IndexedStack(
         index: currentPage,
@@ -66,12 +106,18 @@ class _PatientHomeState extends State<PatientHome> {
             selectedColor: kPrimaryColor,
           ),
           BottomBarItem(
+            icon: badges.Badge(
+                showBadge: nbConv == 0 ? false : true,
+                badgeContent: getConv(),
+                child: const Icon(IconlyLight.chat)),
+            title: const Text("Messages"),
+            unSelectedColor: Colors.black,
+            selectedColor: kPrimaryColor,
+          ),
+          BottomBarItem(
               icon: badges.Badge(
-                  showBadge: nb == 0 || nb == null ? false : true,
-                  badgeContent: Text(
-                    nb.toString(),
-                    style: const TextStyle(color: Colors.white),
-                  ),
+                  showBadge: nbNot == 0 ? false : true,
+                  badgeContent: getNT(),
                   child: const Icon(IconlyLight.notification)),
               title: const Text("Notifications"),
               unSelectedColor: Colors.black,

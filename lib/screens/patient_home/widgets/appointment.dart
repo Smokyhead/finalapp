@@ -78,7 +78,13 @@ class _AppointmentPageState extends State<AppointmentPage> {
           .where('time', isEqualTo: formattedTime)
           .where('isApproved', isEqualTo: true)
           .get();
-      if (querySnapshot1.docs.isEmpty && querySnapshot2.docs.isEmpty) {
+      QuerySnapshot querySnapshot3 = await FirebaseFirestore.instance
+          .collection('Holidays')
+          .where('date', isEqualTo: formattedDate)
+          .get();
+      if (querySnapshot1.docs.isEmpty &&
+          querySnapshot2.docs.isEmpty &&
+          querySnapshot3.docs.isEmpty) {
         FirebaseFirestore.instance.collection("Appointments").doc(uuid).set({
           "id": uuid,
           "doctorId": Doctor.uid,
@@ -128,6 +134,38 @@ class _AppointmentPageState extends State<AppointmentPage> {
             Navigator.pop(context);
           });
         });
+      } else if (querySnapshot3.docs.isNotEmpty) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text(
+                  "OOPS!",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                ),
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                content: const Text(
+                    "vous ne pouvez pas faire de réservation les jours fériés"),
+                actions: [
+                  ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(kPrimaryColor),
+                        foregroundColor:
+                            MaterialStateProperty.all(Colors.white),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("OK"))
+                ],
+              );
+            });
       } else {
         showDialog(
             context: context,
@@ -176,6 +214,14 @@ class _AppointmentPageState extends State<AppointmentPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: AppBar(
+          backgroundColor: kPrimaryColor,
+          foregroundColor: Colors.white,
+          title: const Text("Reservation du rendez-vous"),
+        ),
+      ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
@@ -215,7 +261,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    height: 30,
+                    height: 10,
                   ),
                   CircleAvatar(
                     backgroundColor: Colors.grey,
@@ -329,7 +375,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                     ],
                   ),
                   const SizedBox(
-                    height: 120,
+                    height: 60,
                   ),
                   SizedBox(
                     height: 60,
@@ -375,7 +421,10 @@ class _AppointmentPageState extends State<AppointmentPage> {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pop(context);
+                          setState(() {
+                            formattedDate = "";
+                            formattedTime = "";
+                          });
                         },
                         child: const Text(
                           "Annuler",

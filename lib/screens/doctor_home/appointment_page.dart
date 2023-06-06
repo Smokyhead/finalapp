@@ -1,8 +1,13 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/appoint_model.dart';
+import 'package:finalapp/models/messaging.dart';
+import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/doctor_home/home_screens/chat_doc.dart';
 import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
@@ -32,7 +37,32 @@ class _AppointPageState extends State<AppointPage> {
         child: AppBar(
           backgroundColor: kPrimaryColor,
           foregroundColor: Colors.white,
-          title: const Text("Consultation"),
+          title: const Text("Rendez-vous"),
+          actions: [
+            IconButton(
+                padding: const EdgeInsets.only(right: 15),
+                onPressed: () {
+                  Conversation.id = "";
+                  FirestoreServices.getConv(
+                      Appointment.patientId, Appointment.doctorId);
+                  showDialog(
+                      context: (context),
+                      builder: (BuildContext context) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: kPrimaryColor,
+                          ),
+                        );
+                      });
+                  Timer(const Duration(seconds: 1), () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ChatPageD()));
+                  });
+                },
+                icon: const Icon(IconlyBold.send))
+          ],
         ),
       ),
       body: SingleChildScrollView(

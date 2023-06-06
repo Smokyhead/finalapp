@@ -38,7 +38,7 @@ class _PTodayConsultationsListState extends State<PTodayConsultationsList> {
             elevation: 5,
             backgroundColor: kPrimaryColor,
             foregroundColor: Colors.white,
-            title: const Text("Consultations d'aujourd'hui"),
+            title: const Text("Rendez-vous d'aujourd'hui"),
           ),
         ),
         body: Padding(
@@ -64,7 +64,7 @@ class _PTodayConsultationsListState extends State<PTodayConsultationsList> {
               if (docs == null || docs.isEmpty) {
                 return const Center(
                   child: Text(
-                    "Vous n'avez aucune consultation pour le moment",
+                    "Vous n'avez aucun rendez-vous pour le moment",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
@@ -163,7 +163,7 @@ class _PTodayConsultationsListState extends State<PTodayConsultationsList> {
                                                               Radius.circular(
                                                                   20))),
                                               content: const Text(
-                                                  "vous êtes sur le point de supprimer une consultation!\nvoulez-vous vraiment la supprimer?"),
+                                                  "vous êtes sur le point de supprimer un rendez-vous!\nvoulez-vous vraiment la supprimer?"),
                                               actions: [
                                                 ElevatedButton(
                                                     style: ButtonStyle(

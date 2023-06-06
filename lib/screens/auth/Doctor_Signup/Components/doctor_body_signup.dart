@@ -63,7 +63,7 @@ class _BodyState extends State<Body> {
   }
 
   Future<void> formValidation() async {
-    if (serviceController.text == "") {
+    if (serviceController.text != "") {
       if (isEmailValid(emailController.text) == true &&
           isPhoneValid(phoneController.text) == true) {
         if (pwController.text.trim() == pwConfController.text.trim()) {
@@ -230,7 +230,7 @@ class _BodyState extends State<Body> {
               ),
               shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(20))),
-              content: const Text("Veuillez séléctionnez au moins un service."),
+              content: const Text("Veuillez séléctionnez votre service."),
               actions: [
                 ElevatedButton(
                     style: ButtonStyle(
@@ -341,6 +341,7 @@ class _BodyState extends State<Body> {
   Future saveDataToFirestore(User currentUser) async {
     FirebaseFirestore.instance.collection("Doctors").doc(currentUser.uid).set({
       "role": "doctor",
+      "isApproved": false,
       "userUID": currentUser.uid,
       "userEmail": currentUser.email,
       "firstName": firstNameController.text.trim(),
@@ -355,6 +356,7 @@ class _BodyState extends State<Body> {
     final sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setString("uid", currentUser.uid);
     await sharedPreferences.setString("role", "doctor");
+    await sharedPreferences.setBool("isApproved", false);
     await sharedPreferences.setString(
         "userEmail", currentUser.email.toString());
     await sharedPreferences.setString(
@@ -373,10 +375,10 @@ class _BodyState extends State<Body> {
     return Background(
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <
+        child: Column(mainAxisAlignment: MainAxisAlignment.start, children: <
             Widget>[
           Container(
-            margin: const EdgeInsetsDirectional.only(top: 75),
+            margin: const EdgeInsetsDirectional.only(top: 15),
             child: const Text(
               "Inscrivez vous",
               style: TextStyle(

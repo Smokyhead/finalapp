@@ -92,7 +92,7 @@ class _DConsultationsListState extends State<DConsultationsList> {
             elevation: 5,
             backgroundColor: kPrimaryColor,
             foregroundColor: Colors.white,
-            title: const Text("Mes Consultations"),
+            title: const Text("Mes Rendez-vous"),
             actions: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -166,7 +166,7 @@ class _DConsultationsListState extends State<DConsultationsList> {
                     if (docs == null || docs.isEmpty) {
                       return const Center(
                         child: Text(
-                          "Vous n'avez aucune consultation pour le moment",
+                          "Vous n'avez aucun rendez-vous pour le moment",
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
@@ -275,7 +275,7 @@ class _DConsultationsListState extends State<DConsultationsList> {
                                                                 Radius.circular(
                                                                     20))),
                                                     content: const Text(
-                                                        "vous êtes sur le point de supprimer une consultation!\nvoulez-vous vraiment la supprimer?"),
+                                                        "vous êtes sur le point de supprimer un rendez-vous!\nvoulez-vous vraiment la supprimer?"),
                                                     actions: [
                                                       ElevatedButton(
                                                           style: ButtonStyle(
@@ -423,7 +423,7 @@ class _DConsultationsListState extends State<DConsultationsList> {
           if (docs == null || docs.isEmpty) {
             return const Center(
               child: Text(
-                "Vous n'avez aucune consultation pour le moment",
+                "Vous n'avez aucun rendez-vous pour le moment",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -512,7 +512,7 @@ class _DConsultationsListState extends State<DConsultationsList> {
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(20))),
                                           content: const Text(
-                                              "vous êtes sur le point de supprimer une consultation!\nvoulez-vous vraiment la supprimer?"),
+                                              "vous êtes sur le point de supprimer un rendez-vous!\nvoulez-vous vraiment la supprimer?"),
                                           actions: [
                                             ElevatedButton(
                                                 style: ButtonStyle(
@@ -637,7 +637,7 @@ class _DConsultationsListState extends State<DConsultationsList> {
           if (docs == null || docs.isEmpty) {
             return const Center(
               child: Text(
-                "Vous n'avez aucune consultation pour le moment",
+                "Vous n'avez aucun rendez-vous pour le moment",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -735,7 +735,7 @@ class _DConsultationsListState extends State<DConsultationsList> {
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(20))),
                                           content: const Text(
-                                              "vous êtes sur le point de supprimer une consultation!\nvoulez-vous vraiment la supprimer?"),
+                                              "vous êtes sur le point de supprimer un rendez-vous!\nvoulez-vous vraiment la supprimer?"),
                                           actions: [
                                             ElevatedButton(
                                                 style: ButtonStyle(
