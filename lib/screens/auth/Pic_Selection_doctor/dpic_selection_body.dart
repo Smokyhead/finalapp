@@ -238,7 +238,6 @@ class _DPicSelectBodyState extends State<DPicSelectBody> {
         .doc(Doctor.uid)
         .update({"imageUrl": imageUrl});
     print("image URL: $imageUrl");
-    print("PATIENT IMAGE URL: ${Doctor.imageUrl}");
   }
 
   void checkUrl() {

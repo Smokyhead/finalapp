@@ -72,6 +72,7 @@ class _NewConversationState extends State<NewConversation> {
                       onTap: () {
                         Conversation.id = "";
                         FirestoreServices.getDoctorById(data['userUID']);
+                        FirestoreServices.getConv(Patient.uid, data['userUID']);
                         showDialog(
                             context: (context),
                             builder: (BuildContext context) {

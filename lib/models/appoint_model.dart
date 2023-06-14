@@ -15,6 +15,7 @@ class Appointment {
   static String patientImage = "";
   static String billId = "";
   static String prescriptionId = "";
+  static bool completed = false;
 
   static void fromMap(Map<String, dynamic> data) {
     doctorId = data['doctorId'] ?? '';
@@ -33,6 +34,7 @@ class Appointment {
     billId = data['billId'] ?? '';
     prescriptionId = data['prescriptionId'] ?? '';
     id = data['id'] ?? '';
+    completed = data['completed'] ?? false;
   }
 }
 

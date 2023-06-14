@@ -216,7 +216,7 @@ class _ConsultationsState extends State<Consultations> {
                     if (docs == null || docs.isEmpty) {
                       return const Center(
                         child: Text(
-                          "Vous n'avez aucun rendez-vous pour le moment",
+                          "Aucun rendez-vous à afficher pour le moment",
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
@@ -424,7 +424,7 @@ class _ConsultationsState extends State<Consultations> {
           if (docs == null || docs.isEmpty) {
             return const Center(
               child: Text(
-                "Vous n'avez aucun rendez-vous pour le moment",
+                "Aucun rendez-vous à afficher pour le moment",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -606,7 +606,7 @@ class _ConsultationsState extends State<Consultations> {
           if (docs == null || docs.isEmpty) {
             return const Center(
               child: Text(
-                "Vous n'avez aucun rendez-vous pour le moment",
+                "Aucun rendez-vous à afficher pour le moment",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -801,7 +801,7 @@ class _ConsultationsState extends State<Consultations> {
           if (docs == null || docs.isEmpty) {
             return const Center(
               child: Text(
-                "Vous n'avez aucun rendez-vous pour le moment",
+                "Aucun rendez-vous à afficher pour le moment",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,

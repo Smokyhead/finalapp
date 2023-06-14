@@ -5,7 +5,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/users.dart';
-import 'package:finalapp/screens/patient_home/appointment_page_p.dart';
 import 'package:finalapp/screens/patient_home/doctor_profile.dart';
 import 'package:finalapp/screens/patient_home/home_screens/consultations_list.dart';
 import 'package:finalapp/screens/patient_home/home_screens/doctors_list.dart';
@@ -15,8 +14,6 @@ import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:uuid/uuid.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -156,6 +153,7 @@ class _HomePageState extends State<HomePage> {
                         .where('isApproved', isEqualTo: true)
                         .where('patientId', isEqualTo: Patient.uid)
                         .where('date', isEqualTo: today)
+                        .where('status', isEqualTo: 'upcoming')
                         .orderBy('dateTime', descending: false)
                         .snapshots(),
                     builder: (context, snapshots) {
@@ -214,6 +212,8 @@ class _HomePageState extends State<HomePage> {
                                 id: data['id'],
                                 patientPhone: data['patientPhone'],
                                 patientid: data['patientId'],
+                                prescriptionId: data['patientId'],
+                                billId: data['patientId'],
                                 role: 'patient',
                               );
                             },
@@ -222,279 +222,6 @@ class _HomePageState extends State<HomePage> {
                       }
                     },
                   ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    width: size.width - 50,
-                    height: 0.5,
-                    color: Colors.black,
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: const [
-                        Text(
-                          "Rendez-vous Prochain",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        )
-                      ]),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection("Appointments")
-                          .where('isApproved', isEqualTo: true)
-                          .where('patientId', isEqualTo: Patient.uid)
-                          .where('status', isEqualTo: 'upcoming')
-                          .orderBy('dateTime', descending: false)
-                          .snapshots(),
-                      builder: (context, snapshots) {
-                        if (snapshots.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(
-                              color: kPrimaryColor,
-                            ),
-                          );
-                        }
-                        final docs = snapshots.data?.docs;
-                        if (docs == null || docs.isEmpty) {
-                          return const Center(
-                            child: Text(
-                              "Vous n'avez aucun rendez-vous à venir pour le moment",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color: Colors.grey),
-                              textAlign: TextAlign.center,
-                            ),
-                          );
-                        } else {
-                          final doc = snapshots.data?.docs.first;
-                          final data = doc!.data() as Map<String, dynamic>;
-                          return SizedBox(
-                            height: 100,
-                            width: size.width * 0.95,
-                            child: Card(
-                                elevation: 2.5,
-                                color: const Color.fromARGB(255, 227, 239, 246),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20)),
-                                child: ListTile(
-                                  onTap: () {
-                                    FirestoreServices.getappointById(
-                                        data['id']);
-                                    showDialog(
-                                        context: (context),
-                                        builder: (BuildContext context) {
-                                          return const Center(
-                                            child: CircularProgressIndicator(
-                                              color: kPrimaryColor,
-                                            ),
-                                          );
-                                        });
-                                    Timer(const Duration(seconds: 2), () {
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const AppointPage()));
-                                    });
-                                  },
-                                  contentPadding: const EdgeInsets.all(5),
-                                  leading: CircleAvatar(
-                                    radius: 30,
-                                    backgroundColor: const Color.fromARGB(
-                                        255, 255, 255, 255),
-                                    backgroundImage: const AssetImage(
-                                        "assets/images/avatar.jpg"),
-                                    foregroundImage: data['doctorImageUrl']
-                                            .isEmpty
-                                        ? null
-                                        : NetworkImage(data['doctorImageUrl']),
-                                  ),
-                                  title: Text(
-                                    "${data['doctorFirstName']} ${data['doctorLastName']}",
-                                    style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(
-                                        "Date: ${data['date']}",
-                                        style: const TextStyle(
-                                            color: Colors.black),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        "Heure: ${data['time']}",
-                                        style: const TextStyle(
-                                            color: Colors.black),
-                                      ),
-                                    ],
-                                  ),
-                                  trailing: SizedBox(
-                                    width: 100,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 15,
-                                          backgroundColor: Colors.red,
-                                          child: IconButton(
-                                            onPressed: () {
-                                              showDialog(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext build) {
-                                                    return AlertDialog(
-                                                      title: const Text(
-                                                        "Avertissement!",
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 30,
-                                                            color: Colors.red),
-                                                      ),
-                                                      shape: const RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius
-                                                                      .circular(
-                                                                          20))),
-                                                      content: const Text(
-                                                          "vous êtes sur le point de supprimer un rendez-vous!\nvoulez-vous vraiment la supprimer?"),
-                                                      actions: [
-                                                        ElevatedButton(
-                                                            style: ButtonStyle(
-                                                              backgroundColor:
-                                                                  MaterialStateProperty
-                                                                      .all(
-                                                                          kPrimaryColor),
-                                                              foregroundColor:
-                                                                  MaterialStateProperty
-                                                                      .all(Colors
-                                                                          .white),
-                                                              shape:
-                                                                  MaterialStateProperty
-                                                                      .all(
-                                                                RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            30)),
-                                                              ),
-                                                            ),
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child: const Text(
-                                                                "Annuler")),
-                                                        ElevatedButton(
-                                                            style: ButtonStyle(
-                                                              backgroundColor:
-                                                                  MaterialStateProperty
-                                                                      .all(Colors
-                                                                          .red),
-                                                              foregroundColor:
-                                                                  MaterialStateProperty
-                                                                      .all(Colors
-                                                                          .white),
-                                                              shape:
-                                                                  MaterialStateProperty
-                                                                      .all(
-                                                                RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            30)),
-                                                              ),
-                                                            ),
-                                                            onPressed: () {
-                                                              FirebaseFirestore
-                                                                  .instance
-                                                                  .collection(
-                                                                      "Appointments")
-                                                                  .doc(data[
-                                                                      'id'])
-                                                                  .delete();
-                                                              final uuid =
-                                                                  const Uuid()
-                                                                      .v4();
-                                                              FirebaseFirestore
-                                                                  .instance
-                                                                  .collection(
-                                                                      'Notifications')
-                                                                  .doc(uuid)
-                                                                  .set({
-                                                                'read': false,
-                                                                'patient': data[
-                                                                    'patientId'],
-                                                                'doctor': data[
-                                                                    'doctorId'],
-                                                                'title':
-                                                                    "Annulation",
-                                                                'content':
-                                                                    "Votre rendez-vous avec Dr $data['doctorFirstName'] $data['doctorLaststName'] le $data['date'] à $data['time'] est annulée",
-                                                                'dateTime':
-                                                                    dateTime,
-                                                                'appointmentId':
-                                                                    data['id'],
-                                                                'id': uuid
-                                                              });
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child: const Text(
-                                                                "Supprimer"))
-                                                      ],
-                                                    );
-                                                  });
-                                            },
-                                            icon: const Icon(
-                                              IconlyBold.delete,
-                                              size: 15,
-                                            ),
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        CircleAvatar(
-                                          radius: 15,
-                                          backgroundColor: Colors.green,
-                                          child: IconButton(
-                                            onPressed: () {
-                                              final Uri url = Uri(
-                                                  scheme: 'tel',
-                                                  path: data['doctorPhone']);
-                                              launchUrl(url);
-                                            },
-                                            icon: const Icon(
-                                              IconlyBold.call,
-                                              size: 15,
-                                            ),
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                )),
-                          );
-                        }
-                      }),
                   const SizedBox(
                     height: 15,
                   ),

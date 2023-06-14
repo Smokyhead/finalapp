@@ -172,7 +172,7 @@ class FirestoreServices {
           .where('doctor', isEqualTo: doctor)
           .limit(1)
           .get();
-      final data = snapshot.docs[0].data();
+      final data = snapshot.docs.first.data();
       if (data.isNotEmpty) {
         print("exists");
         print(data.toString());

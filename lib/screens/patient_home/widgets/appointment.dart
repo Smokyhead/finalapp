@@ -463,8 +463,10 @@ class _AppointmentPageState extends State<AppointmentPage> {
                 minuteInterval: 15,
                 use24hFormat: true,
                 mode: CupertinoDatePickerMode.time,
-                initialDateTime: DateTime.now()
-                    .add(Duration(minutes: 15 - DateTime.now().minute % 15)),
+                initialDateTime: formattedTime == ""
+                    ? DateTime.now()
+                        .add(Duration(minutes: 15 - DateTime.now().minute % 15))
+                    : _selectedTime,
                 onDateTimeChanged: (value) => setState(() {
                   _selectedTime = value;
                   formattedTime = DateFormat('HH:mm').format(_selectedTime);

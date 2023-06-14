@@ -71,7 +71,7 @@ class _DoctorsListState extends State<DoctorsList> {
                     var data = snapshots.data!.docs[index].data()
                         as Map<String, dynamic>;
                     return Card(
-                      margin: const EdgeInsets.only(top: 10, bottom: 10),
+                      margin: const EdgeInsets.only(top: 5, bottom: 5),
                       elevation: 2.5,
                       color: const Color.fromARGB(255, 243, 243, 243),
                       shape: RoundedRectangleBorder(

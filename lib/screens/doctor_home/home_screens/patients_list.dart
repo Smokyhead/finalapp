@@ -333,7 +333,7 @@ class _PatientsListState extends State<PatientsList> {
                         ),
                       );
                     }
-                    return Container();
+                    return null;
                   }),
             );
           }

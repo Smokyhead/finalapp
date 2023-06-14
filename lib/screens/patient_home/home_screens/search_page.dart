@@ -4,7 +4,6 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
-import 'package:finalapp/screens/patient_home/doctor_profile.dart';
 import 'package:finalapp/screens/patient_home/home_screens/doctor.dart';
 import 'package:finalapp/screens/patient_home/widgets/appointment.dart';
 import 'package:finalapp/services/firestoreServices.dart';

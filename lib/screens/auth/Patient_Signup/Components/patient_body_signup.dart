@@ -64,16 +64,14 @@ class _BodyState extends State<Body> {
   }
 
   Future<void> formValidation() async {
-    if (isEmailValid(emailController.text) == true &&
-        isPhoneValid(phoneController.text) == true) {
+    if (isEmailValid(emailController.text.trim()) == true &&
+        isPhoneValid(phoneController.text.trim()) == true) {
       if (pwController.text.trim() == pwConfController.text.trim()) {
-        if (firstNameController.text.isNotEmpty &&
-            lastNameController.text.isNotEmpty &&
-            isEmailValid(emailController.text) == true &&
-            isPhoneValid(phoneController.text) == true &&
-            dateController.text.isNotEmpty &&
-            pwController.text.isNotEmpty &&
-            pwConfController.text.isNotEmpty) {
+        if (firstNameController.text.trim().isNotEmpty &&
+            lastNameController.text.trim().isNotEmpty &&
+            dateController.text.trim().isNotEmpty &&
+            pwController.text.trim().isNotEmpty &&
+            pwConfController.text.trim().isNotEmpty) {
           if (isPasswordValid(pwController.text.trim()) == true) {
             showDialog(
                 context: context,

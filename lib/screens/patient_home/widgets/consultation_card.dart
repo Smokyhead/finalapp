@@ -1,5 +1,12 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
+import 'package:finalapp/models/messaging.dart';
+import 'package:finalapp/models/users.dart';
+import 'package:finalapp/screens/doctor_home/home_screens/chat_doc.dart';
+import 'package:finalapp/screens/patient_home/home_screens/chat.dart';
+import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,6 +25,8 @@ class ConsultationCard extends StatelessWidget {
       required this.lastName,
       required this.patientPhone,
       required this.doctorPhone,
+      required this.billId,
+      required this.prescriptionId,
       required this.role});
   final String doctorid;
   final String patientid;
@@ -29,6 +38,8 @@ class ConsultationCard extends StatelessWidget {
   final String time;
   final String patientPhone;
   final String doctorPhone;
+  final String billId;
+  final String prescriptionId;
   final String role;
 
   final DateTime dateTime = DateTime.now();
@@ -169,6 +180,14 @@ class ConsultationCard extends StatelessWidget {
                                     ),
                                     onPressed: () {
                                       FirebaseFirestore.instance
+                                          .collection("Prescriptions")
+                                          .doc(prescriptionId)
+                                          .delete();
+                                      FirebaseFirestore.instance
+                                          .collection("Bills")
+                                          .doc(billId)
+                                          .delete();
+                                      FirebaseFirestore.instance
                                           .collection("Appointments")
                                           .doc(id)
                                           .delete();
@@ -203,25 +222,77 @@ class ConsultationCard extends StatelessWidget {
                     color: Colors.white,
                   ),
                 ),
-                CircleAvatar(
-                  radius: 17,
-                  backgroundColor: Colors.green,
-                  child: IconButton(
-                    onPressed: () {
-                      if (role == 'doctor') {
-                        final Uri url = Uri(scheme: 'tel', path: patientPhone);
-                        launchUrl(url);
-                      } else {
-                        final Uri url = Uri(scheme: 'tel', path: doctorPhone);
-                        launchUrl(url);
-                      }
-                    },
-                    icon: const Icon(
-                      IconlyBold.call,
-                      size: 18,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    CircleAvatar(
+                      radius: 17,
+                      backgroundColor: Colors.green,
+                      child: IconButton(
+                        onPressed: () {
+                          if (role == 'doctor') {
+                            final Uri url =
+                                Uri(scheme: 'tel', path: patientPhone);
+                            launchUrl(url);
+                          } else {
+                            final Uri url =
+                                Uri(scheme: 'tel', path: doctorPhone);
+                            launchUrl(url);
+                          }
+                        },
+                        icon: const Icon(
+                          IconlyBold.call,
+                          size: 18,
+                        ),
+                        color: Colors.white,
+                      ),
                     ),
-                    color: Colors.white,
-                  ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    CircleAvatar(
+                      radius: 17,
+                      backgroundColor: kPrimaryColor,
+                      child: IconButton(
+                        onPressed: () {
+                          Conversation.id = "";
+                          showDialog(
+                              context: (context),
+                              builder: (BuildContext context) {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    color: kPrimaryColor,
+                                  ),
+                                );
+                              });
+                          if (Role.role == 'doctor') {
+                            FirestoreServices.getPatientById(patientid);
+                            FirestoreServices.getConv(patientid, doctorid);
+                            Timer(const Duration(seconds: 1), () {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const ChatPageD()));
+                            });
+                          } else {
+                            FirestoreServices.getDoctorById(doctorid);
+                            FirestoreServices.getConv(patientid, doctorid);
+                            Timer(const Duration(seconds: 1), () {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const ChatPage()));
+                            });
+                          }
+                        },
+                        icon: const Icon(
+                          IconlyBold.send,
+                          size: 18,
+                        ),
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 )
               ],
             )

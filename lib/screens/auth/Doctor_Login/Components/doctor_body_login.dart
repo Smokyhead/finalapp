@@ -31,7 +31,6 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
   String passwordVal = "";
   bool hidePassword = true;
   late String userID;
-  bool isFound = true;
 
   @override
   void initState() {
@@ -39,7 +38,8 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
   }
 
   Future<void> formValidation() async {
-    if (myController1.text.isNotEmpty && myController2.text.isNotEmpty) {
+    if (myController1.text.trim().isNotEmpty &&
+        myController2.text.trim().isNotEmpty) {
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -107,10 +107,6 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
           print("You are not a doctor!!");
         }
       } else {
-        isFound = false;
-        isDoctor = true;
-        currentUser.delete();
-        signIn();
         print('Doctor not found');
       }
     } catch (e) {
@@ -130,18 +126,15 @@ class _DoctorLoginBodyState extends State<DoctorLoginBody> {
       final User currentUser = userCredential.user!;
       id = currentUser.uid;
       await getDoctorById(id, currentUser);
-      print(Doctor.isApproved);
       if (isDoctor == true) {
+        Role.role = 'doctor';
+        Navigator.pop(context);
         if (Doctor.isApproved == true) {
-          Navigator.pop(context);
-
           Navigator.push(context,
               MaterialPageRoute(builder: (BuildContext context) {
             return const DoctorHome();
           }));
-        } else if (isFound == true && Doctor.isApproved == false) {
-          Navigator.pop(context);
-
+        } else {
           Navigator.push(context,
               MaterialPageRoute(builder: (BuildContext context) {
             return const WaitingPage();

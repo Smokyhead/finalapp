@@ -2,10 +2,10 @@
 
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/appoint_model.dart';
 import 'package:finalapp/models/messaging.dart';
-import 'package:finalapp/models/users.dart';
 import 'package:finalapp/screens/patient_home/home_screens/chat.dart';
 import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +53,82 @@ class _AppointPageState extends State<AppointPage> {
                             builder: (context) => const ChatPage()));
                   });
                 },
-                icon: const Icon(IconlyBold.send))
+                icon: const Icon(IconlyBold.send)),
+            Appointment.status == 'upcoming'
+                ? IconButton(
+                    padding: const EdgeInsets.only(right: 15),
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext build) {
+                            return AlertDialog(
+                              title: const Text(
+                                "Avertissement!",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 30,
+                                    color: Colors.red),
+                              ),
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20))),
+                              content: const Text(
+                                  "vous êtes sur le point de supprimer un rendez-vous!\nvoulez-vous vraiment la supprimer?"),
+                              actions: [
+                                ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
+                                              kPrimaryColor),
+                                      foregroundColor:
+                                          MaterialStateProperty.all(
+                                              Colors.white),
+                                      shape: MaterialStateProperty.all(
+                                        RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30)),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text("Annuler")),
+                                ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all(Colors.red),
+                                      foregroundColor:
+                                          MaterialStateProperty.all(
+                                              Colors.white),
+                                      shape: MaterialStateProperty.all(
+                                        RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30)),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      FirebaseFirestore.instance
+                                          .collection("Appointments")
+                                          .doc(Appointment.id)
+                                          .delete();
+                                      FirebaseFirestore.instance
+                                          .collection("Prescriptions")
+                                          .doc(Prescription.id)
+                                          .delete();
+                                      FirebaseFirestore.instance
+                                          .collection("Bills")
+                                          .doc(Bill.id)
+                                          .delete();
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text("Supprimer"))
+                              ],
+                            );
+                          });
+                    },
+                    icon: const Icon(IconlyBold.delete))
+                : const SizedBox.shrink()
           ],
         ),
       ),
@@ -109,7 +184,7 @@ class _AppointPageState extends State<AppointPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.all(30),
               child: Row(

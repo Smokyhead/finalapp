@@ -164,7 +164,143 @@ class _MessagingDState extends State<MessagingD> {
                                   backgroundColor: kPrimaryColor,
                                   radius: 10,
                                 )
-                              : const SizedBox.shrink(),
+                              : IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                              shape:
+                                                  const RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  15))),
+                                              content: SizedBox(
+                                                height: 128,
+                                                child: Column(children: [
+                                                  data['read'] == false
+                                                      ? ListTile(
+                                                          onTap: () {
+                                                            FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    "Conversations")
+                                                                .doc(data['id'])
+                                                                .update({
+                                                              "seenByDoctor":
+                                                                  true
+                                                            });
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          title: const Text(
+                                                              "Marquer comme lu"),
+                                                        )
+                                                      : ListTile(
+                                                          onTap: () {
+                                                            FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    "Conversations")
+                                                                .doc(data['id'])
+                                                                .update({
+                                                              "seenByDoctor":
+                                                                  false
+                                                            });
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          title: const Text(
+                                                              "Marquer comme non lu"),
+                                                        ),
+                                                  const Divider(),
+                                                  ListTile(
+                                                    onTap: () {
+                                                      FirebaseFirestore.instance
+                                                          .collection(
+                                                              "Conversations")
+                                                          .doc(data['id'])
+                                                          .delete();
+                                                      Navigator.pop(context);
+                                                    },
+                                                    title: const Text(
+                                                      "Supprimer",
+                                                      style: TextStyle(
+                                                          color: Colors.red,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  )
+                                                ]),
+                                              ));
+                                        });
+                                  },
+                                  icon: const Icon(
+                                    Icons.more_vert,
+                                    size: 32.5,
+                                  ),
+                                ),
+                          onLongPress: () {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                      shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15))),
+                                      content: SizedBox(
+                                        height: 128,
+                                        child: Column(children: [
+                                          data['read'] == false
+                                              ? ListTile(
+                                                  onTap: () {
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            "Conversations")
+                                                        .doc(data['id'])
+                                                        .update({
+                                                      "seenByDoctor": true
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                  title: const Text(
+                                                      "Marquer comme lu"),
+                                                )
+                                              : ListTile(
+                                                  onTap: () {
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            "Conversations")
+                                                        .doc(data['id'])
+                                                        .update({
+                                                      "seenByDoctor": false
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                  title: const Text(
+                                                      "Marquer comme non lu"),
+                                                ),
+                                          const Divider(),
+                                          ListTile(
+                                            onTap: () {
+                                              FirebaseFirestore.instance
+                                                  .collection("Conversations")
+                                                  .doc(data['id'])
+                                                  .delete();
+                                              Navigator.pop(context);
+                                            },
+                                            title: const Text(
+                                              "Supprimer",
+                                              style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          )
+                                        ]),
+                                      ));
+                                });
+                          },
                         ),
                       ),
                     );

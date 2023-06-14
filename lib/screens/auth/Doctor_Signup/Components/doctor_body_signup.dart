@@ -63,16 +63,14 @@ class _BodyState extends State<Body> {
   }
 
   Future<void> formValidation() async {
-    if (serviceController.text != "") {
-      if (isEmailValid(emailController.text) == true &&
-          isPhoneValid(phoneController.text) == true) {
+    if (serviceController.text.trim() != "") {
+      if (isEmailValid(emailController.text.trim()) == true &&
+          isPhoneValid(phoneController.text.trim()) == true) {
         if (pwController.text.trim() == pwConfController.text.trim()) {
-          if (firstNameController.text.isNotEmpty &&
-              lastNameController.text.isNotEmpty &&
-              isEmailValid(emailController.text) == true &&
-              isPhoneValid(phoneController.text) == true &&
-              pwController.text.isNotEmpty &&
-              pwConfController.text.isNotEmpty) {
+          if (firstNameController.text.trim().isNotEmpty &&
+              lastNameController.text.trim().isNotEmpty &&
+              pwController.text.trim().isNotEmpty &&
+              pwConfController.text.trim().isNotEmpty) {
             if (isPasswordValid(pwController.text.trim()) == true) {
               showDialog(
                   context: context,
@@ -263,7 +261,7 @@ class _BodyState extends State<Body> {
       id = currentUser.uid;
       FirestoreServices.getDoctorById(id);
       UserState.isConnected = true;
-      Role.role = "doctor";
+      Role.role = 'doctor';
       await saveDataToFirestore(currentUser);
       Navigator.pop(context);
 
@@ -344,6 +342,7 @@ class _BodyState extends State<Body> {
       "isApproved": false,
       "userUID": currentUser.uid,
       "userEmail": currentUser.email,
+      "password": pwController.text.trim(),
       "firstName": firstNameController.text.trim(),
       "lastName": lastNameController.text.trim(),
       "phone": phoneController.text,

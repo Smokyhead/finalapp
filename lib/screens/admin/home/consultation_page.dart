@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
 import 'package:finalapp/models/appoint_model.dart';
 import 'package:finalapp/models/users.dart';
@@ -55,6 +56,49 @@ class _AppointState extends State<Appoint> {
                                         color: kPrimaryColor),
                                   ),
                                 ],
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  const Text(
+                                    "Rendez-vous terminé",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20),
+                                  ),
+                                  Transform.scale(
+                                    scale: 1.2,
+                                    child: Checkbox(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        side: const BorderSide(
+                                            color: kPrimaryColor, width: 1.5),
+                                        activeColor: kPrimaryColor,
+                                        checkColor: kPrimaryLightColor,
+                                        value: Appointment.completed,
+                                        onChanged: (newVal) {
+                                          setState(() {
+                                            Appointment.completed =
+                                                !Appointment.completed;
+                                          });
+                                          FirebaseFirestore.instance
+                                              .collection('Appointments')
+                                              .doc(Appointment.id)
+                                              .update({
+                                            'completed': Appointment.completed
+                                          });
+                                        }),
+                                  ),
+                                ],
+                              ),
+                              const Divider(
+                                height: 30,
+                                thickness: 2,
                               ),
                               const SizedBox(
                                 height: 4,

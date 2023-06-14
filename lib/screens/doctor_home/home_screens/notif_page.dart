@@ -93,8 +93,27 @@ class _DNotifPageState extends State<DNotifPage> {
                 itemBuilder: (context, index) {
                   var data = snapshots.data!.docs[index].data()
                       as Map<String, dynamic>;
+                  final appointmentTime = data['dateTime'] as Timestamp;
+                  final appointmentDateTime = appointmentTime.toDate();
+                  final currentTime = DateTime.now();
+                  if (appointmentDateTime.isBefore(currentTime)) {
+                    FirebaseFirestore.instance.collection('Notifications').add({
+                      'read': false,
+                      'patient': data['patientId'],
+                      'doctor': data['doctorId'],
+                      'doctorImage': data['doctorImageUrl'],
+                      'title': "Dotre demande n'est plus valable",
+                      'content':
+                          "Votre demande pour rendez-vous avec Dr ${data['doctorFirstName']} ${data['doctorLastName']} le ${data['date']} à ${data['time']} n'est plus valable et était supprimé",
+                      'dateTime': dateTime,
+                      'appointmentId': data['id'],
+                    });
+                    FirebaseFirestore.instance
+                        .collection("Appointments")
+                        .doc(data["id"])
+                        .delete();
+                  }
                   return ListTile(
-                    onTap: () async {},
                     isThreeLine: true,
                     leading: CircleAvatar(
                       radius: 30,

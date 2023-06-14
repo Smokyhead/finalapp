@@ -1,12 +1,7 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
-import 'package:finalapp/models/messaging.dart';
 import 'package:finalapp/models/users.dart';
-import 'package:finalapp/screens/patient_home/home_screens/chat.dart';
 import 'package:finalapp/screens/patient_home/widgets/appointment.dart';
-import 'package:finalapp/services/firestoreServices.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:url_launcher/url_launcher.dart';

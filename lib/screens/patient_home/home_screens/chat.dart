@@ -17,6 +17,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  final String today = DateFormat('dd/MM/yyyy').format(DateTime.now());
   TextEditingController message = TextEditingController();
   bool typing = false;
   String uuid = "";
@@ -107,25 +108,47 @@ class _ChatPageState extends State<ChatPage> {
                     var data = snapshots.data!.docs[index].data()
                         as Map<String, dynamic>;
                     if (data['sender'] == Patient.uid) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: kPrimaryColor,
-                                borderRadius: BorderRadius.circular(30)),
-                            padding: const EdgeInsets.all(15),
-                            child: Text(
-                              data['message'],
-                              style: const TextStyle(
-                                  fontSize: 17, color: Colors.white),
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                    color: kPrimaryColor,
+                                    borderRadius: BorderRadius.circular(30)),
+                                padding: const EdgeInsets.all(15),
+                                child: Text(
+                                  data['message'],
+                                  style: const TextStyle(
+                                      fontSize: 17, color: Colors.white),
+                                ),
+                              ),
+                            ],
                           ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              data['date'] == today
+                                  ? Text(
+                                      data['time'],
+                                      style: const TextStyle(fontSize: 12),
+                                    )
+                                  : Text(
+                                      "Le ${data['date']} à ${data['time']}",
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                            ],
+                          )
                         ],
                       );
                     } else {
                       return Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           CircleAvatar(
@@ -144,7 +167,6 @@ class _ChatPageState extends State<ChatPage> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Dr ${Doctor.firstName} ${Doctor.lastName}"),
                               Container(
                                 decoration: BoxDecoration(
                                     color: kPrimaryLightColor,
@@ -155,6 +177,23 @@ class _ChatPageState extends State<ChatPage> {
                                   style: const TextStyle(fontSize: 17),
                                 ),
                               ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  data['date'] == today
+                                      ? Text(
+                                          data['time'],
+                                          style: const TextStyle(fontSize: 12),
+                                        )
+                                      : Text(
+                                          "Le ${data['date']} à ${data['time']}",
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                  const SizedBox(
+                                    width: 15,
+                                  ),
+                                ],
+                              )
                             ],
                           ),
                         ],
@@ -238,8 +277,8 @@ class _ChatPageState extends State<ChatPage> {
                                 'seenByDoctor': false,
                                 'seenByPatient': true,
                                 'lastActivity': DateTime.now(),
-                                'date':
-                                    DateFormat('yMd').format(DateTime.now()),
+                                'date': DateFormat('dd/MM/yyyy')
+                                    .format(DateTime.now()),
                                 'time': DateFormat.Hm().format(DateTime.now()),
                                 'lastMessage': message.text.trim(),
                                 'patientFirstName': Patient.firstName,
@@ -258,8 +297,8 @@ class _ChatPageState extends State<ChatPage> {
                                 'sender': Patient.uid,
                                 'message': message.text.trim(),
                                 'dateTime': DateTime.now(),
-                                'date':
-                                    DateFormat('yMd').format(DateTime.now()),
+                                'date': DateFormat('dd/MM/yyyy')
+                                    .format(DateTime.now()),
                                 'time': DateFormat.Hm().format(DateTime.now()),
                               });
                             } else {
@@ -272,8 +311,8 @@ class _ChatPageState extends State<ChatPage> {
                                 'sender': Patient.uid,
                                 'message': message.text.trim(),
                                 'dateTime': DateTime.now(),
-                                'date':
-                                    DateFormat('yMd').format(DateTime.now()),
+                                'date': DateFormat('dd/MM/yyyy')
+                                    .format(DateTime.now()),
                                 'time': DateFormat.Hm().format(DateTime.now()),
                               });
                               FirebaseFirestore.instance
@@ -283,8 +322,8 @@ class _ChatPageState extends State<ChatPage> {
                                 'lastActivity': DateTime.now(),
                                 'lastMessage': message.text.trim(),
                                 'seenByDoctor': false,
-                                'date':
-                                    DateFormat('yMd').format(DateTime.now()),
+                                'date': DateFormat('dd/MM/yyyy')
+                                    .format(DateTime.now()),
                                 'time': DateFormat.Hm().format(DateTime.now()),
                               });
                             }

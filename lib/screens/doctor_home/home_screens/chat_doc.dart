@@ -17,6 +17,7 @@ class ChatPageD extends StatefulWidget {
 }
 
 class _ChatPageDState extends State<ChatPageD> {
+  final String today = DateFormat('dd/MM/yyyy').format(DateTime.now());
   TextEditingController message = TextEditingController();
   bool typing = false;
   String uuid = "";
@@ -36,6 +37,12 @@ class _ChatPageDState extends State<ChatPageD> {
 
   @override
   Widget build(BuildContext context) {
+    FirebaseFirestore.instance
+        .collection('Conversations')
+        .doc(Conversation.id)
+        .update({
+      'seenByDoctor': true,
+    });
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -100,32 +107,54 @@ class _ChatPageDState extends State<ChatPageD> {
               child: ListView.separated(
                   reverse: true,
                   separatorBuilder: (context, index) => const SizedBox(
-                        height: 5,
+                        height: 8,
                       ),
                   itemCount: snapshots.data!.docs.length,
                   itemBuilder: (context, index) {
                     var data = snapshots.data!.docs[index].data()
                         as Map<String, dynamic>;
                     if (data['sender'] == Doctor.uid) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: kPrimaryColor,
-                                borderRadius: BorderRadius.circular(30)),
-                            padding: const EdgeInsets.all(15),
-                            child: Text(
-                              data['message'],
-                              style: const TextStyle(
-                                  fontSize: 17, color: Colors.white),
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                    color: kPrimaryColor,
+                                    borderRadius: BorderRadius.circular(30)),
+                                padding: const EdgeInsets.all(15),
+                                child: Text(
+                                  data['message'],
+                                  style: const TextStyle(
+                                      fontSize: 17, color: Colors.white),
+                                ),
+                              ),
+                            ],
                           ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              data['date'] == today
+                                  ? Text(
+                                      data['time'],
+                                      style: const TextStyle(fontSize: 12),
+                                    )
+                                  : Text(
+                                      "Le ${data['date']} à ${data['time']}",
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                            ],
+                          )
                         ],
                       );
                     } else {
                       return Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           CircleAvatar(
@@ -144,7 +173,6 @@ class _ChatPageDState extends State<ChatPageD> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("${Patient.firstName} ${Patient.lastName}"),
                               Container(
                                 decoration: BoxDecoration(
                                     color: kPrimaryLightColor,
@@ -155,6 +183,23 @@ class _ChatPageDState extends State<ChatPageD> {
                                   style: const TextStyle(fontSize: 17),
                                 ),
                               ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  const SizedBox(
+                                    width: 15,
+                                  ),
+                                  data['date'] == today
+                                      ? Text(
+                                          data['time'],
+                                          style: const TextStyle(fontSize: 12),
+                                        )
+                                      : Text(
+                                          "Le ${data['date']} à ${data['time']}",
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                ],
+                              )
                             ],
                           ),
                         ],
@@ -238,8 +283,8 @@ class _ChatPageDState extends State<ChatPageD> {
                                 'seenByDoctor': true,
                                 'seenByPatient': false,
                                 'lastActivity': DateTime.now(),
-                                'date':
-                                    DateFormat('yMd').format(DateTime.now()),
+                                'date': DateFormat('dd/MM/yyyy')
+                                    .format(DateTime.now()),
                                 'time': DateFormat.Hm().format(DateTime.now()),
                                 'lastMessage': message.text.trim(),
                                 'patientFirstName': Patient.firstName,
@@ -258,8 +303,8 @@ class _ChatPageDState extends State<ChatPageD> {
                                 'sender': Doctor.uid,
                                 'message': message.text.trim(),
                                 'dateTime': DateTime.now(),
-                                'date':
-                                    DateFormat('yMd').format(DateTime.now()),
+                                'date': DateFormat('dd/MM/yyyy')
+                                    .format(DateTime.now()),
                                 'time': DateFormat.Hm().format(DateTime.now()),
                               });
                             } else {
@@ -272,8 +317,8 @@ class _ChatPageDState extends State<ChatPageD> {
                                 'sender': Doctor.uid,
                                 'message': message.text.trim(),
                                 'dateTime': DateTime.now(),
-                                'date':
-                                    DateFormat('yMd').format(DateTime.now()),
+                                'date': DateFormat('dd/MM/yyyy')
+                                    .format(DateTime.now()),
                                 'time': DateFormat.Hm().format(DateTime.now()),
                               });
                               FirebaseFirestore.instance
@@ -283,8 +328,8 @@ class _ChatPageDState extends State<ChatPageD> {
                                 'lastActivity': DateTime.now(),
                                 'lastMessage': message.text.trim(),
                                 'seenByPatient': false,
-                                'date':
-                                    DateFormat('yMd').format(DateTime.now()),
+                                'date': DateFormat('dd/MM/yyyy')
+                                    .format(DateTime.now()),
                                 'time': DateFormat.Hm().format(DateTime.now()),
                               });
                             }

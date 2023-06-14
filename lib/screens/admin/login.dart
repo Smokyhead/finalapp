@@ -62,7 +62,8 @@ class _ConnexionBodyState extends State<ConnexionBody> {
   }
 
   Future<void> formValidation() async {
-    if (myController1.text.isNotEmpty && myController2.text.isNotEmpty) {
+    if (myController1.text.trim().isNotEmpty &&
+        myController2.text.trim().isNotEmpty) {
       showDialog(
           context: context,
           builder: (BuildContext context) {

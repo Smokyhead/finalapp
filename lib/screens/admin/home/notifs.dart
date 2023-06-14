@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finalapp/constants.dart';
+import 'package:finalapp/models/admin.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
+import 'package:http/http.dart' as http;
 
 class Notifs extends StatefulWidget {
   const Notifs({super.key});
@@ -11,6 +16,39 @@ class Notifs extends StatefulWidget {
 }
 
 class _NotifsState extends State<Notifs> {
+  String message1 =
+      "Votre compte a été approuvé,\nVous pouvez maintenant utilisier l'application.";
+  String message2 =
+      "Votre compte a été supprimé,\nVous n'êtes pas inscrit à la clinique.";
+  Future sendEmail({
+    required String result,
+    required String toEmail,
+    required String toName,
+    required String message,
+  }) async {
+    const serviceId = 'clin';
+    const templateId = 'template_grnmjwi';
+    const userId = 'fFvfsdhiiJ0709RVg';
+    final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+    final response = await http.post(url,
+        headers: {
+          'Content_Type': 'application/json',
+        },
+        body: jsonEncode({
+          'service_id': serviceId,
+          'template_id': templateId,
+          'user_id': userId,
+          'template_params': {
+            'result': result,
+            'to_email': toEmail,
+            'to_name': toName,
+            'message': message
+          }
+        }));
+    // ignore: avoid_print
+    print(response.body);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,6 +140,12 @@ class _NotifsState extends State<Notifs> {
                                     .collection('Doctors')
                                     .doc(data['userUID'])
                                     .update({'isApproved': true});
+                                sendEmail(
+                                    result: 'approuvé',
+                                    toEmail: data['userEmail'],
+                                    toName:
+                                        '${data['firstName']} ${data['lastName']}',
+                                    message: message1);
                               },
                               icon: const Icon(
                                 Icons.check,
@@ -114,11 +158,30 @@ class _NotifsState extends State<Notifs> {
                             radius: 15,
                             backgroundColor: Colors.red,
                             child: IconButton(
-                              onPressed: () {
+                              onPressed: () async {
+                                final UserCredential userCredential =
+                                    await FirebaseAuth.instance
+                                        .signInWithEmailAndPassword(
+                                  email: data['userEmail'],
+                                  password: data['password'],
+                                );
+                                final User user = userCredential.user!;
+                                await user.delete();
                                 FirebaseFirestore.instance
                                     .collection('Doctors')
                                     .doc(data['userUID'])
                                     .delete();
+                                sendEmail(
+                                    result: 'supprimé',
+                                    toEmail: data['userEmail'],
+                                    toName:
+                                        '${data['firstName']} ${data['lastName']}',
+                                    message: message2);
+                                FirebaseAuth.instance
+                                    .signInWithEmailAndPassword(
+                                  email: Admin.email,
+                                  password: Admin.password,
+                                );
                               },
                               icon: const Icon(
                                 IconlyBold.delete,
