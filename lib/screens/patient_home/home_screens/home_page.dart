@@ -152,8 +152,8 @@ class _HomePageState extends State<HomePage> {
                         .collection("Appointments")
                         .where('isApproved', isEqualTo: true)
                         .where('patientId', isEqualTo: Patient.uid)
-                        .where('date', isEqualTo: today)
                         .where('status', isEqualTo: 'upcoming')
+                        .where('date', isEqualTo: today)
                         .orderBy('dateTime', descending: false)
                         .snapshots(),
                     builder: (context, snapshots) {

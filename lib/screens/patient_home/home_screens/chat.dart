@@ -180,6 +180,9 @@ class _ChatPageState extends State<ChatPage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
+                                  const SizedBox(
+                                    width: 15,
+                                  ),
                                   data['date'] == today
                                       ? Text(
                                           data['time'],
@@ -189,9 +192,6 @@ class _ChatPageState extends State<ChatPage> {
                                           "Le ${data['date']} à ${data['time']}",
                                           style: const TextStyle(fontSize: 12),
                                         ),
-                                  const SizedBox(
-                                    width: 15,
-                                  ),
                                 ],
                               )
                             ],
