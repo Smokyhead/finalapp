@@ -3,6 +3,7 @@ import 'package:finalapp/constants.dart';
 import 'package:finalapp/screens/Welcome/welcome_screen.dart';
 import 'package:finalapp/screens/admin/home/consultations.dart';
 import 'package:finalapp/screens/admin/home/doctors_list_admin.dart';
+import 'package:finalapp/screens/admin/home/edit_account.dart';
 import 'package:finalapp/screens/admin/home/feedbacks.dart';
 import 'package:finalapp/screens/admin/home/holidays.dart';
 import 'package:finalapp/screens/admin/home/notifs.dart';
@@ -60,9 +61,20 @@ class _AdminHomeState extends State<AdminHome> {
           elevation: 10,
           automaticallyImplyLeading: false,
           backgroundColor: kPrimaryColor,
-          title: const Text(
-            "ADMIN",
-            style: TextStyle(fontSize: 27, fontWeight: FontWeight.w500),
+          title: TextButton(
+            onPressed: () {
+              FirestoreServices.signOut();
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const EditAccount();
+              }));
+            },
+            child: const Text(
+              "ADMIN",
+              style: TextStyle(
+                  fontSize: 27,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white),
+            ),
           ),
           actions: [
             IconButton(

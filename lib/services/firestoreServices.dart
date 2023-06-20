@@ -1,6 +1,7 @@
 // ignore_for_file: file_names, avoid_print, no_leading_underscores_for_local_identifiers
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finalapp/models/admin.dart';
 import 'package:finalapp/models/appoint_model.dart';
 import 'package:finalapp/models/messaging.dart';
 import 'package:finalapp/models/observation_model.dart';
@@ -17,6 +18,27 @@ class FirestoreServices {
     } catch (e) {
       print(e.toString());
       return null;
+    }
+  }
+
+  static Future<void> getAdminById(String id) async {
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('Admin').doc(id).get();
+
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        if (data['role'] == "admin") {
+          print("this is the DATA: $data");
+          Admin.fromMap(data);
+          print("DONE!!!");
+        }
+      } else {
+        print('Doctor not found');
+      }
+    } catch (e) {
+      print(e.toString());
+      print("something went wrong!!");
     }
   }
 
